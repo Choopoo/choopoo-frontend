@@ -24,16 +24,9 @@ export type CrawlResponse = {
 }
 
 export type PipelineStatus = {
-  status: 'ok' | 'degraded' | 'down'
-  services: {
-    kafka: boolean
-    redis: boolean
-    postgres: boolean
-  }
-  throughput?: {
-    crawl_rate_per_min: number
-    process_rate_per_min: number
-  }
+  kafka: string
+  redis: string
+  postgres: string
 }
 
 export type PricePoint = {

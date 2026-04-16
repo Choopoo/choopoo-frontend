@@ -30,7 +30,10 @@ export default function Dashboard() {
   const liveResults = resultsQ.data && resultsQ.data.length > 0
   const results = liveResults ? resultsQ.data! : MOCK_RESULTS
   const topBriefing = results[0]
-  const pipelineOk = statusQ.data?.status === 'ok'
+  const pipelineOk =
+    statusQ.data?.kafka === 'ok' &&
+    statusQ.data?.redis === 'ok' &&
+    statusQ.data?.postgres === 'ok'
 
   const current = MOCK_PRICE_SERIES[MOCK_PRICE_SERIES.length - 1].price
   const prev = MOCK_PRICE_SERIES[MOCK_PRICE_SERIES.length - 2].price
