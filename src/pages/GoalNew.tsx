@@ -70,15 +70,14 @@ export default function GoalNew() {
     nav(`/goals/${createdGoalId}`)
   }
 
-  // Filter indicator suggestions by lens.
   const suggestedIndicators = (indicatorsQ.data ?? []).filter((i) => filterByLens(i, lens)).slice(0, 12)
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-6 space-y-6">
+    <div className="max-w-3xl mx-auto px-6 py-6 space-y-5">
       <header>
-        <h1 className="text-2xl font-semibold text-ink-900">New Goal</h1>
-        <p className="text-sm text-ink-500 mt-1">
-          Step {step} of 2 — {step === 1 ? 'name your goal' : 'pick driver indicators'}
+        <h1 className="type-page-title">New goal</h1>
+        <p className="type-page-sub">
+          step {step} of 2 — {step === 1 ? 'name your goal' : 'pick driver indicators'}
         </p>
       </header>
 
@@ -86,18 +85,18 @@ export default function GoalNew() {
         <Card>
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="block text-xs text-ink-500 mb-1">Title</label>
+              <label className="label-meta block mb-1.5">Title</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Cut TDI procurement cost 5% before Q4"
-                className="w-full border border-ink-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
+                className="input-base"
                 autoFocus
               />
             </div>
             <div>
-              <label className="block text-xs text-ink-500 mb-2">Lens</label>
+              <label className="label-meta block mb-2">Lens</label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {LENSES.map(({ code, label, icon: Icon, hint }) => (
                   <button
@@ -107,44 +106,43 @@ export default function GoalNew() {
                     className={cn(
                       'flex flex-col items-start gap-1 p-3 border rounded-md text-left transition',
                       lens === code
-                        ? 'border-brand-500 bg-brand-50'
-                        : 'border-ink-200 hover:border-ink-400',
+                        ? 'border-brand-500 bg-brand-50/40'
+                        : 'border-line bg-surface hover:border-line-strong hover:bg-raised',
                     )}
                   >
-                    <span className="flex items-center gap-1.5 text-sm font-medium text-ink-900">
+                    <span className={cn(
+                      'flex items-center gap-1.5 text-sm font-medium',
+                      lens === code ? 'text-brand-500' : 'text-ink-100',
+                    )}>
                       <Icon className="w-4 h-4" /> {label}
                     </span>
-                    <span className="text-xs text-ink-500">{hint}</span>
+                    <span className="text-xs text-ink-400">{hint}</span>
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-xs text-ink-500 mb-1">Horizon (days)</label>
+              <label className="label-meta block mb-1.5">Horizon (days)</label>
               <input
                 type="number"
                 value={horizon}
                 onChange={(e) => setHorizon(e.target.value)}
                 min={7}
                 max={730}
-                className="w-32 border border-ink-200 rounded-md px-3 py-2 text-sm"
+                className="input-base input-mono w-32"
               />
             </div>
-            <div className="flex justify-between items-center pt-2">
-              <Link to="/" className="text-sm text-ink-500 hover:text-ink-900">
+            <div className="flex justify-between items-center pt-2 border-t border-line">
+              <Link to="/" className="text-xs font-mono uppercase tracking-wider text-ink-500 hover:text-ink-100">
                 Cancel
               </Link>
-              <button
-                type="submit"
-                disabled={!title.trim() || createMut.isPending}
-                className="flex items-center gap-2 bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-brand-700 disabled:opacity-50"
-              >
+              <button type="submit" disabled={!title.trim() || createMut.isPending} className="btn-base btn-primary">
                 {createMut.isPending ? 'Creating…' : 'Continue'}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
             {createMut.isError && (
-              <p className="text-xs text-red-600">{(createMut.error as Error).message}</p>
+              <p className="text-xs text-down font-mono">{(createMut.error as Error).message}</p>
             )}
           </form>
         </Card>
@@ -154,23 +152,19 @@ export default function GoalNew() {
         <Card
           title={
             <span className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-brand-600" />
-              Suggested indicators for "{lens}" lens
+              <Sparkles className="w-3.5 h-3.5 text-brand-500" />
+              Suggested for "{lens}"
             </span>
           }
           action={
-            <button
-              onClick={finish}
-              disabled={linkMut.isPending}
-              className="text-xs bg-brand-600 text-white px-3 py-1.5 rounded-md hover:bg-brand-700 disabled:opacity-50"
-            >
-              Done ({pickedIds.size} picked)
+            <button onClick={finish} disabled={linkMut.isPending} className="btn-base btn-primary">
+              Done · {pickedIds.size} picked
             </button>
           }
         >
-          {indicatorsQ.isLoading && <p className="text-sm text-ink-500">Loading…</p>}
+          {indicatorsQ.isLoading && <p className="text-sm text-ink-500 font-mono">loading…</p>}
           {indicatorsQ.isError && (
-            <p className="text-sm text-red-600">{(indicatorsQ.error as Error).message}</p>
+            <p className="text-sm text-down font-mono">{(indicatorsQ.error as Error).message}</p>
           )}
           {indicatorsQ.data && (
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -183,18 +177,23 @@ export default function GoalNew() {
                       className={cn(
                         'w-full text-left p-3 border rounded-md transition',
                         picked
-                          ? 'border-brand-500 bg-brand-50'
-                          : 'border-ink-200 hover:border-ink-400',
+                          ? 'border-brand-500 bg-brand-50/40'
+                          : 'border-line bg-surface hover:border-line-strong hover:bg-raised',
                       )}
                     >
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-sm font-mono font-medium text-ink-900">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className={cn(
+                          'font-mono text-sm font-medium truncate',
+                          picked ? 'text-brand-500' : 'text-ink-50',
+                        )}>
                           {ind.code}
                         </span>
-                        <span className="text-xs text-ink-400">{ind.kind}</span>
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-ink-500 flex-shrink-0">
+                          {ind.kind}
+                        </span>
                       </div>
                       {ind.description && (
-                        <p className="text-xs text-ink-500 mt-1 line-clamp-2">{ind.description}</p>
+                        <p className="text-xs text-ink-400 mt-1 line-clamp-2">{ind.description}</p>
                       )}
                     </button>
                   </li>
@@ -202,9 +201,9 @@ export default function GoalNew() {
               })}
             </ul>
           )}
-          <p className="mt-4 text-xs text-ink-400">
+          <p className="mt-4 text-xs text-ink-500 border-t border-line pt-3">
             Don't see what you need?{' '}
-            <Link to="/copilot" className="text-brand-700 underline">
+            <Link to="/copilot" className="text-brand-500 underline">
               Ask the copilot
             </Link>{' '}
             to add a private one.

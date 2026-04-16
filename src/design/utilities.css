@@ -1,0 +1,309 @@
+/*
+ * Semantic utility classes — prefer these over ad-hoc Tailwind combos for
+ * repeating patterns so the design stays consistent as the product grows.
+ *
+ * Grouped by role:
+ *   · Typography roles       (.type-*, .label-*, .num-*)
+ *   · Interactive elements   (.btn-*, .input-base, .chip-*)
+ *   · Page structure         (.page-title, .page-sub, .section-title)
+ *   · Numeric semantics      (.num-up, .num-down, .tnum)
+ *
+ * Every value is keyed off a token in ./tokens.css. If you need a new
+ * one-off style, first check if a pattern class already covers it.
+ */
+
+/* ─────────────── TYPOGRAPHY ROLES ─────────────── */
+
+.type-display-sm {
+  font-size: var(--text-display-sm);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: var(--color-ink-50);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.type-display-md {
+  font-size: var(--text-display-md);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  color: var(--color-ink-50);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.type-display-lg {
+  font-size: var(--text-display-lg);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  color: var(--color-ink-50);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ALL-CAPS MONO LABELS (used for section headers, chip labels, meta strip) */
+.label-meta {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-11);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-500);
+}
+.label-meta-sm {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-10);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-500);
+}
+
+/* Page-level titles */
+.type-page-title {
+  font-size: var(--font-size-20);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--color-ink-50);
+  line-height: 1.2;
+}
+.type-page-sub {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-11);
+  color: var(--color-ink-500);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.25rem;
+}
+
+/* Section titles (inside cards) — the default Card component uses this */
+.type-section-title {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-11);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-400);
+}
+
+/* ─────────────── NUMERIC SEMANTICS ─────────────── */
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.num-data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  color: var(--color-ink-100);
+}
+.num-data-strong {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  color: var(--color-ink-50);
+  font-weight: 600;
+}
+.num-up   { color: var(--color-up)   !important; }
+.num-down { color: var(--color-down) !important; }
+
+/* ─────────────── INTERACTIVE · BUTTONS ─────────────── */
+
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.875rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-11);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background var(--duration-base) var(--ease-out),
+              color var(--duration-base) var(--ease-out),
+              border-color var(--duration-base) var(--ease-out);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.btn-base:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-brand-600);
+  color: var(--color-canvas);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-brand-500);
+}
+
+.btn-secondary {
+  background: var(--color-raised);
+  color: var(--color-ink-100);
+  border-color: var(--color-line);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-hover);
+  border-color: var(--color-line-strong);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-ink-400);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-hover);
+  color: var(--color-ink-100);
+}
+
+/* ─────────────── INTERACTIVE · INPUTS ─────────────── */
+
+.input-base {
+  width: 100%;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.75rem;
+  font-size: var(--font-size-14);
+  color: var(--color-ink-50);
+  outline: none;
+  transition: border-color var(--duration-base) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out);
+}
+.input-base::placeholder {
+  color: var(--color-ink-500);
+}
+.input-base:focus {
+  border-color: var(--color-line-focus);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-brand-500) 50%, transparent);
+}
+.input-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─────────────── INTERACTIVE · CHIPS / PILLS ─────────────── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-line);
+  background: var(--color-raised);
+  color: var(--color-ink-400);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-10);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.chip-brand {
+  background: var(--color-brand-50);
+  color: var(--color-brand-500);
+  border-color: color-mix(in srgb, var(--color-brand-500) 30%, transparent);
+}
+.chip-up {
+  background: var(--color-up-soft);
+  color: var(--color-up);
+  border-color: color-mix(in srgb, var(--color-up) 30%, transparent);
+}
+.chip-down {
+  background: var(--color-down-soft);
+  color: var(--color-down);
+  border-color: color-mix(in srgb, var(--color-down) 30%, transparent);
+}
+.chip-warn {
+  background: var(--color-warn-soft);
+  color: var(--color-warn);
+  border-color: color-mix(in srgb, var(--color-warn) 30%, transparent);
+}
+
+/* ─────────────── LINKS ─────────────── */
+
+.link-brand {
+  color: var(--color-brand-500);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.link-brand:hover { color: var(--color-brand-600); }
+
+.link-subtle {
+  color: var(--color-ink-400);
+  transition: color var(--duration-base) var(--ease-out);
+}
+.link-subtle:hover { color: var(--color-ink-50); }
+
+/* ─────────────── SURFACE / BACKGROUND HELPERS ─────────────── */
+
+.surface-canvas  { background: var(--color-canvas); }
+.surface-base    { background: var(--color-surface); }
+.surface-raised  { background: var(--color-raised); }
+.hairline        { border-color: var(--color-line); }
+.hairline-strong { border-color: var(--color-line-strong); }
+
+/* ─────────────── MOTION ─────────────── */
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-ticker {
+  animation: ticker-scroll 60s linear infinite;
+}
+
+/* Subtle grid texture for hero / login backgrounds */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--color-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: -1px -1px;
+}
+
+/* ─────────────── PROSE (MARKDOWN BODY) ─────────────── */
+
+.prose-terminal {
+  color: var(--color-ink-100);
+  font-size: var(--font-size-14);
+  line-height: 1.6;
+}
+.prose-terminal strong { color: var(--color-ink-50); font-weight: 600; }
+.prose-terminal em { color: var(--color-ink-200); }
+.prose-terminal code {
+  color: var(--color-brand-500);
+  background: var(--color-raised);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-12);
+}
+.prose-terminal ul { padding-left: 1rem; margin: 0.5rem 0; list-style: disc; }
+.prose-terminal ol { padding-left: 1.25rem; margin: 0.5rem 0; list-style: decimal; }
+.prose-terminal li { margin: 0.15rem 0; }
+.prose-terminal p { margin: 0.4rem 0; }
+.prose-terminal a {
+  color: var(--color-brand-500);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-terminal blockquote {
+  border-left: 2px solid var(--color-brand-700);
+  padding-left: 0.75rem;
+  color: var(--color-ink-200);
+  font-style: italic;
+}
+.prose-terminal h1,
+.prose-terminal h2,
+.prose-terminal h3 {
+  color: var(--color-ink-50);
+  font-weight: 600;
+  margin: 0.75rem 0 0.25rem;
+}

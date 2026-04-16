@@ -18,15 +18,10 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
         <header className="flex items-baseline justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-ink-50 tracking-tight">Desk</h1>
-            <p className="text-xs text-ink-500 font-mono mt-1 tracking-wider uppercase">
-              pinned first · autopilot runs on every new goal
-            </p>
+            <h1 className="type-page-title">Desk</h1>
+            <p className="type-page-sub">pinned first · autopilot runs on every new goal</p>
           </div>
-          <Link
-            to="/goals/new"
-            className="inline-flex items-center gap-1.5 bg-brand-600 text-canvas text-xs font-mono uppercase tracking-wider font-semibold px-3 py-1.5 rounded-md hover:bg-brand-500 transition"
-          >
+          <Link to="/goals/new" className="btn-base btn-primary">
             <Plus className="w-3.5 h-3.5" />
             New goal
           </Link>

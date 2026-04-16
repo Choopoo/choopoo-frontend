@@ -1,48 +1,6 @@
 @import "tailwindcss";
-
-@theme {
-  /* Warm-dark canvas — "Trading desk for PU SMEs" */
-  --color-canvas: #0b0c0f;
-  --color-surface: #13151a;
-  --color-raised: #1b1e25;
-  --color-hover: #22262e;
-  --color-line: #252934;
-  --color-line-strong: #303542;
-
-  /* Warm-tinted ink (slight sepia on high so paper-white doesn't glare) */
-  --color-ink-50: #f5f1e8;
-  --color-ink-100: #e8e3d7;
-  --color-ink-200: #cdc8bc;
-  --color-ink-400: #8b93a1;
-  --color-ink-500: #5a6270;
-  --color-ink-700: #3a4150;
-  --color-ink-900: #0b0c0f;
-
-  /* Brand: amber-gold (drop purple entirely) */
-  --color-brand-50: #3a2d0a;
-  --color-brand-100: #523f0d;
-  --color-brand-500: #e9b464;
-  --color-brand-600: #d9a042;
-  --color-brand-700: #b5832f;
-
-  /* Semantics for up/down/warn/info */
-  --color-up: #4ade80;
-  --color-up-soft: #0f2617;
-  --color-down: #f87171;
-  --color-down-soft: #2a1313;
-  --color-warn: #fbbf24;
-  --color-warn-soft: #26200a;
-  --color-info: #60a5fa;
-  --color-info-soft: #0f1d2e;
-
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
-
-  /* Display type for hero prices */
-  --text-display-sm: 2rem;        /* 32 */
-  --text-display-md: 2.75rem;     /* 44 */
-  --text-display-lg: 3.75rem;     /* 60 */
-}
+@import "./design/tokens.css";
+@import "./design/utilities.css";
 
 html, body, #root {
   height: 100%;
@@ -57,73 +15,8 @@ body {
   font-feature-settings: "cv02", "cv11";
 }
 
-/* Tabular nums wherever numeric columns are rendered */
-.tnum, .font-mono {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
-
-/* Display size utility (hero prices, spreads) */
-.text-display-sm { font-size: var(--text-display-sm); line-height: 1.05; letter-spacing: -0.02em; }
-.text-display-md { font-size: var(--text-display-md); line-height: 1.02; letter-spacing: -0.025em; }
-.text-display-lg { font-size: var(--text-display-lg); line-height: 1.0;  letter-spacing: -0.03em; }
-
-/* Hairline divider helper */
-.hairline { border-color: var(--color-line); }
-
-/* Ticker tape animation — used by TickerStrip when overflowing */
-@keyframes ticker-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.animate-ticker {
-  animation: ticker-scroll 60s linear infinite;
-}
-
-/* Subtle grid texture for hero / login backgrounds */
-.bg-grid {
-  background-image:
-    linear-gradient(var(--color-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
-  background-size: 48px 48px;
-  background-position: -1px -1px;
-}
-
 /* Scrollbar (dark) */
 ::-webkit-scrollbar        { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: var(--color-line-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb  { background: var(--color-line-strong); border-radius: var(--radius-sm); }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-500); }
-
-/* Prose styling for rendered markdown body_md */
-.prose-terminal {
-  color: var(--color-ink-100);
-  font-size: 14px;
-  line-height: 1.6;
-}
-.prose-terminal strong { color: var(--color-ink-50); font-weight: 600; }
-.prose-terminal em { color: var(--color-ink-200); }
-.prose-terminal code {
-  color: var(--color-brand-500);
-  background: var(--color-raised);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-}
-.prose-terminal ul { padding-left: 1rem; margin: 0.5rem 0; list-style: disc; }
-.prose-terminal ol { padding-left: 1.25rem; margin: 0.5rem 0; list-style: decimal; }
-.prose-terminal li { margin: 0.15rem 0; }
-.prose-terminal p { margin: 0.4rem 0; }
-.prose-terminal a { color: var(--color-brand-500); text-decoration: underline; text-underline-offset: 2px; }
-.prose-terminal blockquote {
-  border-left: 2px solid var(--color-brand-700);
-  padding-left: 0.75rem;
-  color: var(--color-ink-200);
-  font-style: italic;
-}
-.prose-terminal h1, .prose-terminal h2, .prose-terminal h3 {
-  color: var(--color-ink-50);
-  font-weight: 600;
-  margin: 0.75rem 0 0.25rem;
-}

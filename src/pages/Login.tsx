@@ -124,13 +124,13 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@your-org.com"
-                  className="mt-1.5 w-full bg-canvas border border-line rounded-md px-3 py-2 text-sm text-ink-50 placeholder:text-ink-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 font-mono"
+                  className="input-base input-mono mt-1.5"
                 />
               </label>
               <button
                 type="submit"
                 disabled={sending || !email.trim()}
-                className="w-full flex items-center justify-center gap-2 bg-brand-600 text-canvas text-xs font-mono uppercase tracking-wider font-semibold px-4 py-2.5 rounded-md hover:bg-brand-500 transition disabled:opacity-40"
+                className="btn-base btn-primary w-full"
               >
                 <Mail className="w-3.5 h-3.5" />
                 {sending ? 'Sending…' : 'Send magic link'}
@@ -141,10 +141,7 @@ export default function Login() {
               <div className="rounded-md bg-up-soft border border-up/30 px-4 py-3 text-xs text-up font-mono">
                 Magic link generated. Production would email it; for the demo, click continue.
               </div>
-              <button
-                onClick={verifyDev}
-                className="w-full flex items-center justify-center gap-2 bg-brand-600 text-canvas text-xs font-mono uppercase tracking-wider font-semibold px-4 py-2.5 rounded-md hover:bg-brand-500 transition"
-              >
+              <button onClick={verifyDev} className="btn-base btn-primary w-full">
                 Continue as {email}
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>

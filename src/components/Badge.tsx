@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react'
 import { cn } from '../lib/utils'
 
-const variants = {
-  ok: 'bg-up-soft text-up border-up/30',
-  warn: 'bg-warn-soft text-warn border-warn/30',
-  err: 'bg-down-soft text-down border-down/30',
-  neutral: 'bg-raised text-ink-400 border-line',
-  brand: 'bg-brand-50 text-brand-500 border-brand-500/30',
+// Thin wrapper that delegates to the design-system `.chip*` utility classes.
+// Keeps the same API as before so no component-level churn.
+const variantClass: Record<string, string> = {
+  ok: 'chip-up',
+  warn: 'chip-warn',
+  err: 'chip-down',
+  neutral: 'chip',
+  brand: 'chip-brand',
 }
 
 export function Badge({
@@ -14,18 +16,12 @@ export function Badge({
   children,
   className,
 }: {
-  variant?: keyof typeof variants
+  variant?: keyof typeof variantClass
   children: ReactNode
   className?: string
 }) {
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-medium border',
-        variants[variant],
-        className,
-      )}
-    >
+    <span className={cn('chip', variantClass[variant], className)}>
       {children}
     </span>
   )

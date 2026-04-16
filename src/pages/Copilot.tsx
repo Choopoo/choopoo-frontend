@@ -132,11 +132,7 @@ export default function Copilot() {
           className="flex-1 bg-transparent py-2.5 text-sm font-mono text-ink-50 placeholder:text-ink-500 outline-none"
           disabled={mut.isPending}
         />
-        <button
-          type="submit"
-          disabled={mut.isPending || !input.trim()}
-          className="flex items-center gap-1 bg-brand-600 text-canvas text-[11px] font-mono uppercase tracking-wider font-semibold px-3 py-1.5 my-1.5 rounded-md hover:bg-brand-500 disabled:opacity-40"
-        >
+        <button type="submit" disabled={mut.isPending || !input.trim()} className="btn-base btn-primary my-1.5">
           <Send className="w-3 h-3" />
           Send
         </button>

@@ -1,0 +1,131 @@
+/*
+ * Choopoo design tokens — "Trading desk for PU SMEs" (warm dark)
+ *
+ * THREE TIERS:
+ *   1. Primitives   — raw values; NEVER referenced by components directly
+ *   2. Semantic     — intent aliases over primitives; the main component-facing layer
+ *   3. Component    — per-component tokens (button, input, badge); reference semantics
+ *
+ * Tailwind v4's @theme block makes these CSS vars available as utility classes
+ * (e.g. `bg-canvas`, `text-ink-100`, `border-line`). Components should prefer
+ * the semantic/component tokens; primitive names should only appear in this file.
+ */
+
+@theme {
+  /* ─────────────── TIER 1 · PRIMITIVES ─────────────── */
+
+  /* Neutral (warm black → bone white) */
+  --color-neutral-0:   #000000;
+  --color-neutral-950: #0b0c0f;
+  --color-neutral-900: #13151a;
+  --color-neutral-800: #1b1e25;
+  --color-neutral-700: #22262e;
+  --color-neutral-600: #252934;
+  --color-neutral-500: #303542;
+  --color-neutral-400: #5a6270;
+  --color-neutral-300: #8b93a1;
+  --color-neutral-200: #cdc8bc;
+  --color-neutral-100: #e8e3d7;
+  --color-neutral-50:  #f5f1e8;
+
+  /* Amber (brand) */
+  --color-amber-900: #3a2d0a;
+  --color-amber-800: #523f0d;
+  --color-amber-500: #e9b464;
+  --color-amber-400: #d9a042;
+  --color-amber-600: #b5832f;
+
+  /* Emerald (up / success) */
+  --color-emerald-900: #0f2617;
+  --color-emerald-500: #4ade80;
+
+  /* Rose (down / error) */
+  --color-rose-900: #2a1313;
+  --color-rose-500: #f87171;
+
+  /* Amber-warn (different from brand amber) */
+  --color-warn-900: #26200a;
+  --color-warn-500: #fbbf24;
+
+  /* Sky (info) */
+  --color-sky-900: #0f1d2e;
+  --color-sky-500: #60a5fa;
+
+  /* Typography primitives */
+  --font-family-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+                      "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --font-family-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  --font-size-10: 0.625rem;  /* 10 */
+  --font-size-11: 0.6875rem; /* 11 */
+  --font-size-12: 0.75rem;   /* 12 */
+  --font-size-13: 0.8125rem; /* 13 */
+  --font-size-14: 0.875rem;  /* 14 */
+  --font-size-16: 1rem;      /* 16 */
+  --font-size-18: 1.125rem;  /* 18 */
+  --font-size-20: 1.25rem;   /* 20 */
+  --font-size-24: 1.5rem;    /* 24 */
+  --font-size-32: 2rem;      /* 32 */
+  --font-size-44: 2.75rem;   /* 44 */
+  --font-size-60: 3.75rem;   /* 60 */
+
+  /* Radius primitives */
+  --radius-sm: 0.25rem;   /* 4 */
+  --radius-md: 0.375rem;  /* 6 */
+  --radius-lg: 0.5rem;    /* 8 */
+  --radius-xl: 0.75rem;   /* 12 */
+  --radius-2xl: 1rem;     /* 16 */
+
+  /* Motion primitives */
+  --duration-fast: 100ms;
+  --duration-base: 150ms;
+  --duration-slow: 250ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─────────────── TIER 2 · SEMANTIC ─────────────── */
+
+  /* Surface hierarchy (background layers from canvas → raised) */
+  --color-canvas:   var(--color-neutral-950);
+  --color-surface:  var(--color-neutral-900);
+  --color-raised:   var(--color-neutral-800);
+  --color-hover:    var(--color-neutral-700);
+
+  /* Border hierarchy (thin → strong) */
+  --color-line:        var(--color-neutral-600);
+  --color-line-strong: var(--color-neutral-500);
+  --color-line-focus:  var(--color-amber-500);
+
+  /* Ink (text) — ink-50 is highest contrast, ink-500 is lowest */
+  --color-ink-50:  var(--color-neutral-50);    /* titles, critical values */
+  --color-ink-100: var(--color-neutral-100);   /* body copy */
+  --color-ink-200: var(--color-neutral-200);   /* secondary body */
+  --color-ink-400: var(--color-neutral-300);   /* labels, captions */
+  --color-ink-500: var(--color-neutral-400);   /* placeholders, hints */
+  --color-ink-700: var(--color-neutral-500);   /* dividers-as-text */
+  --color-ink-900: var(--color-neutral-950);   /* legacy alias (rare use) */
+
+  /* Brand */
+  --color-brand-50:  var(--color-amber-900);
+  --color-brand-100: var(--color-amber-800);
+  --color-brand-500: var(--color-amber-500);
+  --color-brand-600: var(--color-amber-400);
+  --color-brand-700: var(--color-amber-600);
+
+  /* Data semantics */
+  --color-up:       var(--color-emerald-500);
+  --color-up-soft:  var(--color-emerald-900);
+  --color-down:     var(--color-rose-500);
+  --color-down-soft: var(--color-rose-900);
+  --color-warn:     var(--color-warn-500);
+  --color-warn-soft: var(--color-warn-900);
+  --color-info:     var(--color-sky-500);
+  --color-info-soft: var(--color-sky-900);
+
+  /* Typography roles */
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
+
+  --text-display-sm: var(--font-size-32);   /* hero price */
+  --text-display-md: var(--font-size-44);   /* larger hero */
+  --text-display-lg: var(--font-size-60);   /* marketing only */
+}

@@ -15,15 +15,10 @@ export function Card({
   padded?: boolean
 }) {
   return (
-    <section
-      className={cn(
-        'bg-surface border border-line rounded-lg',
-        className,
-      )}
-    >
+    <section className={cn('bg-surface border border-line rounded-lg', className)}>
       {(title || action) && (
         <header className="flex items-center justify-between px-5 py-3 border-b border-line">
-          <h2 className="text-[11px] font-mono uppercase tracking-[0.08em] text-ink-400">{title}</h2>
+          <h2 className="type-section-title">{title}</h2>
           {action}
         </header>
       )}

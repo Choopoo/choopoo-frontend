@@ -31,52 +31,50 @@ export function CrawlForm() {
     mutation.mutate({ urls: list, material, source_label: source })
   }
 
+  const inputCls = 'input-base input-mono'
+
   return (
-    <Card title="Submit Crawl Job">
+    <Card title="Submit crawl job">
       <form onSubmit={submit} className="space-y-3">
         <textarea
           value={urls}
           onChange={(e) => setUrls(e.target.value)}
           placeholder="Paste URLs, one per line"
           rows={3}
-          className="w-full border border-ink-200 rounded-md px-3 py-2 text-sm font-mono focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
+          className={inputCls}
         />
         <div className="flex gap-3">
           <label className="flex-1">
-            <span className="block text-xs text-ink-500 mb-1">Material</span>
+            <span className="label-meta block mb-1">Material</span>
             <select
               value={material}
               onChange={(e) => setMaterial(e.target.value)}
-              className="w-full border border-ink-200 rounded-md px-2 py-1.5 text-sm bg-white"
+              className={inputCls}
             >
-              {MATERIALS.map((m) => <option key={m}>{m}</option>)}
+              {MATERIALS.map((m) => <option key={m} className="bg-surface">{m}</option>)}
             </select>
           </label>
           <label className="flex-1">
-            <span className="block text-xs text-ink-500 mb-1">Source</span>
+            <span className="label-meta block mb-1">Source</span>
             <select
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              className="w-full border border-ink-200 rounded-md px-2 py-1.5 text-sm bg-white"
+              className={inputCls}
             >
-              {SOURCES.map((s) => <option key={s}>{s}</option>)}
+              {SOURCES.map((s) => <option key={s} className="bg-surface">{s}</option>)}
             </select>
           </label>
         </div>
-        <button
-          type="submit"
-          disabled={mutation.isPending || !urls.trim()}
-          className="w-full flex items-center justify-center gap-2 bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Plus className="w-4 h-4" />
+        <button type="submit" disabled={mutation.isPending || !urls.trim()} className="btn-base btn-primary w-full">
+          <Plus className="w-3.5 h-3.5" />
           {mutation.isPending ? 'Submitting…' : 'Submit'}
         </button>
         {mutation.isError && (
-          <p className="text-xs text-red-600">{(mutation.error as Error).message}</p>
+          <p className="text-xs text-down font-mono">{(mutation.error as Error).message}</p>
         )}
         {mutation.isSuccess && (
-          <p className="text-xs text-emerald-600">
-            Accepted {mutation.data.accepted} URL(s), job {mutation.data.job_id}
+          <p className="text-xs text-up font-mono">
+            Accepted {mutation.data.accepted} URL · job {mutation.data.job_id.slice(0, 8)}
           </p>
         )}
       </form>
