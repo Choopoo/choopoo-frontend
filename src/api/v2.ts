@@ -209,6 +209,49 @@ export const v2 = {
   // saga observability
   workflows: (goalId?: number) =>
     req<WorkflowRun[]>('GET', goalId ? `/api/v2/workflows?goal_id=${goalId}` : '/api/v2/workflows'),
+
+  // signal aspects
+  aspectsList: () => req<Aspect[]>('GET', '/api/v2/aspects'),
+  subjectAspects: (code: string, status: 'active' | 'candidate' | 'rejected' | 'all' = 'all') =>
+    req<SubjectAspect[]>('GET', `/api/v2/subjects/${encodeURIComponent(code)}/aspects?status=${status}`),
+  toggleSubjectAspect: (code: string, aspectId: number, active: boolean) =>
+    req<{ status: string }>('POST', `/api/v2/subjects/${encodeURIComponent(code)}/aspects/${aspectId}`, { active }),
+}
+
+export type Aspect = {
+  id: number
+  code: string
+  name: string
+  description: string | null
+  axis: string
+  default_relevance: number
+}
+
+export type InductionStep = { step?: number; cause?: string; effect?: string; fact?: string }
+export type ExampleEvent = {
+  date?: string
+  event?: string
+  observed_impact?: string
+  source_url?: string
+  verified?: boolean
+}
+
+export type SubjectAspect = {
+  subject_code: string
+  aspect_id: number
+  aspect_code: string
+  aspect_name: string
+  axis: string
+  status: 'active' | 'candidate' | 'rejected'
+  relevance_r: number | null
+  diversity_bonus: number | null
+  score: number | null
+  relevance_rationale: string | null
+  induction_chain: InductionStep[] | null
+  example_events: ExampleEvent[]
+  evidence_verified: boolean
+  last_scored_at: string | null
+  provider_count: number
 }
 
 export type WorkflowRun = {

@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import GoalNew from './pages/GoalNew'
 import GoalDetail from './pages/GoalDetail'
 import Materials from './pages/Materials'
+import MaterialDetail from './pages/MaterialDetail'
 import Copilot from './pages/Copilot'
 import InsightDetail from './pages/InsightDetail'
 import Products from './pages/Products'
@@ -66,7 +67,7 @@ export default function App() {
           <Route path="/goals/new" element={<RequireAuth><GoalNew /></RequireAuth>} />
           <Route path="/goals/:id" element={<RequireAuth><GoalDetail /></RequireAuth>} />
           <Route path="/materials" element={<RequireAuth><Materials /></RequireAuth>} />
-          <Route path="/materials/:code" element={<RequireAuth><Materials /></RequireAuth>} />
+          <Route path="/materials/:code" element={<RequireAuth><MaterialDetail /></RequireAuth>} />
           <Route path="/products" element={<RequireAuth><Products /></RequireAuth>} />
           <Route path="/macro" element={<RequireAuth><Macro /></RequireAuth>} />
           <Route path="/copilot" element={<RequireAuth><Copilot /></RequireAuth>} />
