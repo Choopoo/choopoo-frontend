@@ -194,4 +194,28 @@ export const v2 = {
   // copilot
   copilotConverse: (message: string, history?: unknown[]) =>
     req<CopilotResponse>('POST', '/api/v2/copilot/converse', { message, history }),
+
+  // saga observability
+  workflows: (goalId?: number) =>
+    req<WorkflowRun[]>('GET', goalId ? `/api/v2/workflows?goal_id=${goalId}` : '/api/v2/workflows'),
+}
+
+export type WorkflowRun = {
+  id: number
+  kind: string
+  subject_ref: { goal_id?: number; title?: string } | null
+  plan: { entities?: Array<{ code: string; kind: string }> } | null
+  state: 'planning' | 'running' | 'succeeded' | 'failed' | 'compensating' | 'compensated'
+  current_step: number
+  steps_log: Array<{
+    n?: number
+    entity?: { code: string; kind: string }
+    status?: string
+    actions?: Array<Record<string, unknown>>
+    briefing?: string
+    error?: string
+  }>
+  error: string | null
+  started_at: string
+  completed_at: string | null
 }

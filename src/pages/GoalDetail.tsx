@@ -1,9 +1,65 @@
-import { useQuery } from '@tanstack/react-query'
+import { useEffect, useRef } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, BookOpenText, Sparkles } from 'lucide-react'
-import { v2 } from '../api/v2'
+import { ArrowLeft, BookOpenText, Sparkles, Bot, Loader2, CheckCircle2, XCircle } from 'lucide-react'
+import { v2, type WorkflowRun } from '../api/v2'
 import { Card } from '../components/Card'
 import { Badge } from '../components/Badge'
+
+function AutopilotStrip({ run }: { run: WorkflowRun }) {
+  const { state, steps_log } = run
+  const Icon =
+    state === 'succeeded'
+      ? CheckCircle2
+      : state === 'failed' || state === 'compensated'
+        ? XCircle
+        : state === 'planning' || state === 'running'
+          ? Loader2
+          : Bot
+  const color =
+    state === 'succeeded'
+      ? 'text-emerald-600'
+      : state === 'failed' || state === 'compensated'
+        ? 'text-red-600'
+        : 'text-brand-600'
+  return (
+    <Card
+      title={
+        <span className="flex items-center gap-2">
+          <Bot className="w-4 h-4 text-brand-600" />
+          Autopilot saga
+        </span>
+      }
+      action={
+        <Badge variant={state === 'succeeded' ? 'ok' : state === 'failed' ? 'err' : 'brand'}>{state}</Badge>
+      }
+    >
+      <div className="flex items-center gap-2 mb-2 text-sm">
+        <Icon className={`w-4 h-4 ${color} ${state === 'running' || state === 'planning' ? 'animate-spin' : ''}`} />
+        <span className="text-ink-700">
+          {state === 'planning' && 'Planning steps…'}
+          {state === 'running' && `Executing step ${run.current_step}…`}
+          {state === 'succeeded' && 'Goal populated'}
+          {state === 'failed' && (run.error || 'Failed')}
+        </span>
+      </div>
+      {steps_log.length > 0 && (
+        <ol className="space-y-1 text-xs text-ink-500">
+          {steps_log.map((s, i) => (
+            <li key={i} className="font-mono">
+              {s.entity && <>· extracted <b>{s.entity.code}</b> ({s.entity.kind})</>}
+              {s.actions?.map((a, j) => (
+                <div key={j} className="ml-4">→ {Object.entries(a).map(([k, v]) => `${k}: ${v}`).join(', ')}</div>
+              ))}
+              {s.briefing && <>· briefing {s.briefing}</>}
+              {s.error && <span className="text-red-600"> error: {s.error}</span>}
+            </li>
+          ))}
+        </ol>
+      )}
+    </Card>
+  )
+}
 
 export default function GoalDetail() {
   const { id } = useParams<{ id: string }>()
@@ -14,6 +70,35 @@ export default function GoalDetail() {
     queryFn: () => v2.insightsList(goalId),
     enabled: Number.isFinite(goalId),
   })
+  const qc = useQueryClient()
+  const workflowsQ = useQuery({
+    queryKey: ['v2:workflows', goalId],
+    queryFn: () => v2.workflows(goalId),
+    enabled: Number.isFinite(goalId),
+    refetchInterval: (q) => {
+      const latest = (q.state.data as WorkflowRun[] | undefined)?.[0]
+      if (!latest) return 1500
+      return latest.state === 'planning' || latest.state === 'running' ? 1000 : false
+    },
+  })
+  // When the saga transitions to a terminal state, refetch goal + insights so
+  // the newly attached indicators and briefing are visible without a page reload.
+  // We invalidate on first-seen-terminal-state AND whenever the run id changes,
+  // covering both initial-page-open (saga already succeeded) and live transition.
+  const lastKey = useRef<string | null>(null)
+  useEffect(() => {
+    const latest = workflowsQ.data?.[0]
+    if (!latest) return
+    const terminal = latest.state === 'succeeded' || latest.state === 'failed' || latest.state === 'compensated'
+    if (!terminal) return
+    const key = `${latest.id}:${latest.state}`
+    if (lastKey.current !== key) {
+      lastKey.current = key
+      qc.invalidateQueries({ queryKey: ['v2:goal', goalId] })
+      qc.invalidateQueries({ queryKey: ['v2:insights', goalId] })
+      qc.invalidateQueries({ queryKey: ['v2:me:materials'] })
+    }
+  }, [workflowsQ.data, goalId, qc])
 
   if (goalQ.isLoading) return <p className="p-6 text-ink-400">Loading…</p>
   if (goalQ.isError) {
@@ -41,6 +126,8 @@ export default function GoalDetail() {
           </div>
         </div>
       </header>
+
+      {workflowsQ.data && workflowsQ.data[0] && <AutopilotStrip run={workflowsQ.data[0]} />}
 
       <Card title={`Indicators (${goal.indicators.length})`}>
         {goal.indicators.length === 0 ? (
