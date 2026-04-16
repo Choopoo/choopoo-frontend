@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Search, ArrowRight, LogOut, Plus, Sparkles, LineChart, Database, Activity, Target } from 'lucide-react'
+import { Search, ArrowRight, LogOut, Plus, Sparkles, LineChart, Database, Activity, Target, Box, Globe2 } from 'lucide-react'
 import { v2 } from '../api/v2'
 import { useAuth } from '../auth'
 import { cn } from '../lib/utils'
@@ -72,6 +72,8 @@ export function CommandPalette() {
       { id: 'nav:desk', label: 'Go to Desk', icon: Target, group: 'navigate', run: nav_('/') },
       { id: 'nav:ask', label: 'Open Copilot', icon: Sparkles, group: 'navigate', run: nav_('/copilot') },
       { id: 'nav:materials', label: 'Materials portfolio', icon: LineChart, group: 'navigate', run: nav_('/?view=materials') },
+      { id: 'nav:products', label: 'Products · sell lens', icon: Box, group: 'navigate', run: nav_('/products') },
+      { id: 'nav:macro', label: 'Macro · crude / FX / PMI', icon: Globe2, group: 'navigate', run: nav_('/macro') },
       { id: 'nav:sources', label: 'Sources / audit', icon: Database, group: 'navigate', run: nav_('/sources') },
       { id: 'nav:status', label: 'Pipeline status', icon: Activity, group: 'navigate', run: nav_('/status') },
       { id: 'action:new-goal', label: 'Create new goal', hint: 'opens the 2-step wizard', icon: Plus, group: 'action', run: nav_('/goals/new') },

@@ -56,6 +56,16 @@ export type CatalogMaterial = {
   supply_risk: string | null
 }
 
+export type CatalogProduct = {
+  id: number
+  family_id: number | null
+  code: string
+  name: string
+  name_cn: string | null
+  default_region_code: string | null
+  description: string | null
+}
+
 export type CatalogIndicator = {
   id: number
   code: string
@@ -153,6 +163,7 @@ export const v2 = {
 
   // catalog
   catalogMaterials: () => req<CatalogMaterial[]>('GET', '/api/v2/catalog/materials'),
+  catalogProducts: () => req<CatalogProduct[]>('GET', '/api/v2/catalog/products'),
   catalogIndicators: () => req<CatalogIndicator[]>('GET', '/api/v2/catalog/indicators'),
 
   // tenant overlay
