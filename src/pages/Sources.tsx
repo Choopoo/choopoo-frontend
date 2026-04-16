@@ -6,7 +6,6 @@ import { api } from '../api/client'
 import { Badge } from '../components/Badge'
 import { Card } from '../components/Card'
 import { CrawlForm } from '../components/CrawlForm'
-import { MOCK_RESULTS } from '../lib/mockData'
 import { timeAgo } from '../lib/utils'
 
 const MATERIALS = ['All', 'TDI', 'HDI', 'MDI', 'Toluene']
@@ -23,8 +22,8 @@ export default function Sources() {
     retry: false,
   })
 
-  const rows = q.data && q.data.length > 0 ? q.data : MOCK_RESULTS
-  const usingMock = !q.data || q.data.length === 0
+  const rows = q.data ?? []
+  const usingMock = false
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">

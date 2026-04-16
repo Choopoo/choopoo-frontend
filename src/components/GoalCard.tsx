@@ -1,40 +1,40 @@
 import { Link } from 'react-router-dom'
-import { Pin, ShoppingBag, ShoppingCart, Globe2, GitMerge } from 'lucide-react'
+import { ShoppingBag, ShoppingCart, Globe2, GitMerge } from 'lucide-react'
 import type { Goal } from '../api/v2'
-import { Badge } from './Badge'
+import { cn } from '../lib/utils'
 
-const lensLabel: Record<Goal['lens'], { label: string; icon: typeof Pin; color: string }> = {
-  buy: { label: 'Buy', icon: ShoppingCart, color: 'text-amber-600' },
-  sell: { label: 'Sell', icon: ShoppingBag, color: 'text-emerald-600' },
-  macro: { label: 'Macro', icon: Globe2, color: 'text-blue-600' },
-  mixed: { label: 'Mixed', icon: GitMerge, color: 'text-brand-600' },
+const lensConf: Record<Goal['lens'], { label: string; icon: typeof ShoppingCart; tint: string }> = {
+  buy:   { label: 'BUY',   icon: ShoppingCart, tint: 'text-warn' },
+  sell:  { label: 'SELL',  icon: ShoppingBag,  tint: 'text-up' },
+  macro: { label: 'MACRO', icon: Globe2,       tint: 'text-info' },
+  mixed: { label: 'MIXED', icon: GitMerge,     tint: 'text-brand-500' },
 }
 
 export function GoalCard({ goal }: { goal: Goal }) {
-  const { label, icon: Icon, color } = lensLabel[goal.lens]
+  const { label, icon: Icon, tint } = lensConf[goal.lens]
   return (
     <Link
       to={`/goals/${goal.id}`}
-      className="block bg-white border border-ink-200 rounded-lg p-5 hover:border-brand-300 hover:shadow-sm transition"
+      className={cn(
+        'group relative block bg-surface border border-line rounded-lg p-4 hover:border-brand-700 hover:bg-raised transition',
+        goal.pinned && 'border-l-2 border-l-brand-500',
+      )}
     >
       <div className="flex items-start justify-between mb-3">
-        <span className={`flex items-center gap-1.5 text-xs font-medium ${color}`}>
-          <Icon className="w-4 h-4" />
+        <span className={`flex items-center gap-1.5 text-[10px] font-mono tracking-widest ${tint}`}>
+          <Icon className="w-3.5 h-3.5" />
           {label}
         </span>
-        {goal.pinned && (
-          <Pin className="w-3.5 h-3.5 text-brand-600 fill-brand-200" />
+        {goal.horizon_days != null && (
+          <span className="text-[10px] font-mono text-ink-500 tnum">{goal.horizon_days}D</span>
         )}
       </div>
-      <h3 className="text-sm font-semibold text-ink-900 leading-snug line-clamp-2">{goal.title}</h3>
+      <h3 className="text-sm font-semibold text-ink-100 leading-snug line-clamp-2 group-hover:text-ink-50">
+        {goal.title}
+      </h3>
       {goal.description && (
-        <p className="text-xs text-ink-500 mt-1.5 line-clamp-2">{goal.description}</p>
+        <p className="text-xs text-ink-400 mt-1.5 line-clamp-2">{goal.description}</p>
       )}
-      <div className="mt-3 flex items-center gap-2">
-        {goal.horizon_days && (
-          <Badge variant="neutral">{goal.horizon_days}d horizon</Badge>
-        )}
-      </div>
     </Link>
   )
 }

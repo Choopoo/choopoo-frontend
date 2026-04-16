@@ -6,26 +6,28 @@ export function Card({
   action,
   children,
   className,
+  padded = true,
 }: {
   title?: ReactNode
   action?: ReactNode
   children: ReactNode
   className?: string
+  padded?: boolean
 }) {
   return (
     <section
       className={cn(
-        'bg-white border border-ink-200 rounded-lg shadow-sm',
+        'bg-surface border border-line rounded-lg',
         className,
       )}
     >
       {(title || action) && (
-        <header className="flex items-center justify-between px-5 py-3 border-b border-ink-200">
-          <h2 className="text-sm font-semibold text-ink-700">{title}</h2>
+        <header className="flex items-center justify-between px-5 py-3 border-b border-line">
+          <h2 className="text-[11px] font-mono uppercase tracking-[0.08em] text-ink-400">{title}</h2>
           {action}
         </header>
       )}
-      <div className="p-5">{children}</div>
+      <div className={padded ? 'p-5' : ''}>{children}</div>
     </section>
   )
 }

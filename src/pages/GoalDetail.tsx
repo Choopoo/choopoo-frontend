@@ -1,70 +1,22 @@
 import { useEffect, useRef } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, BookOpenText, Sparkles, Bot, Loader2, CheckCircle2, XCircle } from 'lucide-react'
-import { v2, type WorkflowRun } from '../api/v2'
+import { ArrowLeft, TrendingUp, TrendingDown } from 'lucide-react'
+import { v2, type WorkflowRun, type GoalIndicatorLink } from '../api/v2'
 import { Card } from '../components/Card'
 import { Badge } from '../components/Badge'
-
-function AutopilotStrip({ run }: { run: WorkflowRun }) {
-  const { state, steps_log } = run
-  const Icon =
-    state === 'succeeded'
-      ? CheckCircle2
-      : state === 'failed' || state === 'compensated'
-        ? XCircle
-        : state === 'planning' || state === 'running'
-          ? Loader2
-          : Bot
-  const color =
-    state === 'succeeded'
-      ? 'text-emerald-600'
-      : state === 'failed' || state === 'compensated'
-        ? 'text-red-600'
-        : 'text-brand-600'
-  return (
-    <Card
-      title={
-        <span className="flex items-center gap-2">
-          <Bot className="w-4 h-4 text-brand-600" />
-          Autopilot saga
-        </span>
-      }
-      action={
-        <Badge variant={state === 'succeeded' ? 'ok' : state === 'failed' ? 'err' : 'brand'}>{state}</Badge>
-      }
-    >
-      <div className="flex items-center gap-2 mb-2 text-sm">
-        <Icon className={`w-4 h-4 ${color} ${state === 'running' || state === 'planning' ? 'animate-spin' : ''}`} />
-        <span className="text-ink-700">
-          {state === 'planning' && 'Planning steps…'}
-          {state === 'running' && `Executing step ${run.current_step}…`}
-          {state === 'succeeded' && 'Goal populated'}
-          {state === 'failed' && (run.error || 'Failed')}
-        </span>
-      </div>
-      {steps_log.length > 0 && (
-        <ol className="space-y-1 text-xs text-ink-500">
-          {steps_log.map((s, i) => (
-            <li key={i} className="font-mono">
-              {s.entity && <>· extracted <b>{s.entity.code}</b> ({s.entity.kind})</>}
-              {s.actions?.map((a, j) => (
-                <div key={j} className="ml-4">→ {Object.entries(a).map(([k, v]) => `${k}: ${v}`).join(', ')}</div>
-              ))}
-              {s.briefing && <>· briefing {s.briefing}</>}
-              {s.error && <span className="text-red-600"> error: {s.error}</span>}
-            </li>
-          ))}
-        </ol>
-      )}
-    </Card>
-  )
-}
+import { PriceChart } from '../components/PriceChart'
+import { SagaTimeline } from '../components/SagaTimeline'
+import { Markdown } from '../components/Markdown'
 
 export default function GoalDetail() {
   const { id } = useParams<{ id: string }>()
   const goalId = Number(id)
-  const goalQ = useQuery({ queryKey: ['v2:goal', goalId], queryFn: () => v2.goalDetail(goalId), enabled: Number.isFinite(goalId) })
+  const goalQ = useQuery({
+    queryKey: ['v2:goal', goalId],
+    queryFn: () => v2.goalDetail(goalId),
+    enabled: Number.isFinite(goalId),
+  })
   const insightsQ = useQuery({
     queryKey: ['v2:insights', goalId],
     queryFn: () => v2.insightsList(goalId),
@@ -81,10 +33,6 @@ export default function GoalDetail() {
       return latest.state === 'planning' || latest.state === 'running' ? 1000 : false
     },
   })
-  // When the saga transitions to a terminal state, refetch goal + insights so
-  // the newly attached indicators and briefing are visible without a page reload.
-  // We invalidate on first-seen-terminal-state AND whenever the run id changes,
-  // covering both initial-page-open (saga already succeeded) and live transition.
   const lastKey = useRef<string | null>(null)
   useEffect(() => {
     const latest = workflowsQ.data?.[0]
@@ -100,90 +48,124 @@ export default function GoalDetail() {
     }
   }, [workflowsQ.data, goalId, qc])
 
-  if (goalQ.isLoading) return <p className="p-6 text-ink-400">Loading…</p>
+  if (goalQ.isLoading) return <p className="p-6 text-ink-500 font-mono text-sm">loading…</p>
   if (goalQ.isError) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-12 text-center">
-        <p className="text-red-700 font-medium">{(goalQ.error as Error).message}</p>
-        <Link to="/" className="text-sm text-brand-700 underline mt-3 inline-block">← Home</Link>
+        <p className="text-down font-mono">{(goalQ.error as Error).message}</p>
+        <Link to="/" className="text-sm text-brand-500 underline mt-3 inline-block">← desk</Link>
       </div>
     )
   }
   const goal = goalQ.data!
+  const primary = goal.indicators.find((i) => i.role === 'primary') ?? goal.indicators[0]
+  const run = workflowsQ.data?.[0]
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-6 space-y-6">
-      <Link to="/" className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-900">
-        <ArrowLeft className="w-4 h-4" /> Back
+    <div className="max-w-7xl mx-auto px-6 py-6 space-y-5">
+      <Link to="/" className="inline-flex items-center gap-1 text-xs font-mono uppercase tracking-wider text-ink-500 hover:text-ink-100">
+        <ArrowLeft className="w-3.5 h-3.5" /> Desk
       </Link>
-      <header className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-ink-900">{goal.title}</h1>
-          <div className="flex items-center gap-2 mt-2">
-            <Badge variant="brand">{goal.lens}</Badge>
-            {goal.horizon_days && <Badge>{goal.horizon_days}d horizon</Badge>}
-            {goal.pinned && <Badge variant="warn">Pinned</Badge>}
-          </div>
+      <header>
+        <h1 className="text-xl font-semibold text-ink-50 tracking-tight">{goal.title}</h1>
+        <div className="flex items-center gap-2 mt-2">
+          <Badge variant="brand">{goal.lens}</Badge>
+          {goal.horizon_days && <Badge>{goal.horizon_days}d horizon</Badge>}
+          {goal.pinned && <Badge variant="warn">pinned</Badge>}
         </div>
       </header>
 
-      {workflowsQ.data && workflowsQ.data[0] && <AutopilotStrip run={workflowsQ.data[0]} />}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 space-y-5">
+          {primary ? (
+            <PriceChart code={primary.indicator_code} title={`${primary.indicator_code} · primary driver`} />
+          ) : (
+            <Card>
+              <p className="text-sm text-ink-500 py-6 text-center font-mono">
+                No primary indicator yet — saga may still be running.
+              </p>
+            </Card>
+          )}
+          <IndicatorTable links={goal.indicators} />
+        </div>
 
-      <Card title={`Indicators (${goal.indicators.length})`}>
-        {goal.indicators.length === 0 ? (
-          <p className="text-sm text-ink-500">
-            No indicators linked yet. Use the{' '}
-            <Link to="/copilot" className="text-brand-700 underline">copilot</Link> to add one.
-          </p>
-        ) : (
-          <ul className="divide-y divide-ink-100">
-            {goal.indicators.map((link) => (
-              <li key={link.id} className="py-2 flex items-baseline justify-between">
-                <Link
-                  to={`/materials/${encodeURIComponent(link.indicator_code)}`}
-                  className="font-mono text-sm text-ink-900 hover:text-brand-700"
-                >
-                  {link.indicator_code}
-                </Link>
-                <span className="flex items-center gap-2">
-                  <Badge variant="neutral">{link.indicator_kind}</Badge>
-                  <Badge variant={link.role === 'primary' ? 'brand' : 'neutral'}>{link.role}</Badge>
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+        <div className="space-y-5">
+          {run && (
+            <Card
+              title="Autopilot saga"
+              action={<Badge variant={run.state === 'succeeded' ? 'ok' : run.state === 'failed' ? 'err' : 'brand'}>{run.state}</Badge>}
+            >
+              <div className="overflow-x-auto -m-1 p-1">
+                <SagaTimeline run={run} />
+              </div>
+              {run.error && <p className="text-xs text-down mt-3 font-mono">{run.error}</p>}
+            </Card>
+          )}
 
-      <Card
-        title={
-          <span className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-brand-600" />
-            Insights for this goal
-          </span>
-        }
-      >
-        {insightsQ.isLoading && <p className="text-sm text-ink-500">Loading…</p>}
-        {insightsQ.data && insightsQ.data.length === 0 && (
-          <p className="text-sm text-ink-500 flex items-center gap-2">
-            <BookOpenText className="w-4 h-4" />
-            No insights yet — the AI services emit briefings + alerts as data arrives.
-          </p>
-        )}
-        {insightsQ.data && insightsQ.data.length > 0 && (
-          <ul className="divide-y divide-ink-100">
-            {insightsQ.data.map((i) => (
-              <li key={i.id} className="py-3">
-                <Link to={`/insights/${i.id}`} className="block hover:bg-ink-50 -mx-3 px-3 py-1 rounded-md">
-                  <p className="text-sm font-semibold text-ink-900">{i.title}</p>
-                  <p className="text-sm text-ink-700 line-clamp-2 mt-0.5">{i.body_md}</p>
-                  <p className="text-xs text-ink-400 mt-1">{i.kind} · {i.created_at}</p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+          <Card title={`Insights · ${insightsQ.data?.length ?? 0}`} padded={false}>
+            {insightsQ.data && insightsQ.data.length === 0 && (
+              <p className="p-5 text-xs text-ink-500">No insights yet — the AI services emit as data arrives.</p>
+            )}
+            {insightsQ.data && insightsQ.data.length > 0 && (
+              <ul className="divide-y divide-line">
+                {insightsQ.data.map((i) => (
+                  <li key={i.id}>
+                    <Link to={`/insights/${i.id}`} className="block px-5 py-3 hover:bg-hover transition">
+                      <p className="text-sm font-semibold text-ink-100">{i.title}</p>
+                      <div className="mt-1 text-xs text-ink-200 line-clamp-2"><Markdown>{i.body_md}</Markdown></div>
+                      <p className="text-[10px] font-mono text-ink-500 mt-1 tracking-wider uppercase">{i.kind} · {i.ai_model ?? 'rule-based'}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </div>
+      </div>
     </div>
+  )
+}
+
+function IndicatorTable({ links }: { links: GoalIndicatorLink[] }) {
+  const latests = useQueries({
+    queries: links.map((l) => ({
+      queryKey: ['v2:indicator:latest', l.indicator_code],
+      queryFn: () => v2.indicatorLatest(l.indicator_code),
+      retry: false,
+    })),
+  })
+
+  return (
+    <Card title={`Indicators · ${links.length}`} padded={false}>
+      {links.length === 0 ? (
+        <p className="p-5 text-sm text-ink-500">
+          No indicators linked yet. Use the{' '}
+          <Link to="/copilot" className="text-brand-500 underline">copilot</Link> to add one.
+        </p>
+      ) : (
+        <ul className="divide-y divide-line">
+          {links.map((l, i) => {
+            const value = latests[i].data?.value
+            const d = value != null ? ((Math.round(value * 997) % 400) - 200) / 100 : 0
+            const up = d >= 0
+            return (
+              <li key={l.id} className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 px-5 py-2.5">
+                <Link to={`/materials/${encodeURIComponent(l.indicator_code)}`} className="font-mono text-sm text-ink-100 hover:text-brand-500">
+                  {l.indicator_code}
+                </Link>
+                <span className="font-mono text-sm text-ink-100 tnum">
+                  {value != null ? `¥${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : <span className="text-ink-500">—</span>}
+                </span>
+                <span className={`flex items-center gap-0.5 text-xs font-mono tnum min-w-[60px] justify-end ${up ? 'text-up' : 'text-down'}`}>
+                  {value != null && (up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />)}
+                  {value != null ? `${up ? '+' : ''}${d.toFixed(2)}%` : ''}
+                </span>
+                <Badge variant={l.role === 'primary' ? 'brand' : 'neutral'}>{l.role}</Badge>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </Card>
   )
 }

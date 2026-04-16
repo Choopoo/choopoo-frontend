@@ -2,11 +2,11 @@ import type { ReactNode } from 'react'
 import { cn } from '../lib/utils'
 
 const variants = {
-  ok: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  warn: 'bg-amber-50 text-amber-700 border-amber-200',
-  err: 'bg-red-50 text-red-700 border-red-200',
-  neutral: 'bg-ink-100 text-ink-700 border-ink-200',
-  brand: 'bg-brand-50 text-brand-700 border-brand-100',
+  ok: 'bg-up-soft text-up border-up/30',
+  warn: 'bg-warn-soft text-warn border-warn/30',
+  err: 'bg-down-soft text-down border-down/30',
+  neutral: 'bg-raised text-ink-400 border-line',
+  brand: 'bg-brand-50 text-brand-500 border-brand-500/30',
 }
 
 export function Badge({
@@ -21,7 +21,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border',
+        'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-medium border',
         variants[variant],
         className,
       )}
