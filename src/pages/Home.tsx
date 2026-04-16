@@ -1,16 +1,36 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { Plus } from 'lucide-react'
-import { v2 } from '../api/v2'
+import { Link, useSearchParams } from 'react-router-dom'
+import { AlertTriangle, Plus, ShieldCheck, TrendingDown, TrendingUp } from 'lucide-react'
+import { v2, type ResolvedIndicator, type ResolvedMaterial } from '../api/v2'
 import { GoalCard } from '../components/GoalCard'
 import { TickerStrip } from '../components/TickerStrip'
 import { Markdown } from '../components/Markdown'
 import { Card } from '../components/Card'
+import { Sparkline } from '../components/Sparkline'
+import { cn } from '../lib/utils'
 
+/**
+ * Desk is the single consumption surface. Supports two view modes via
+ * `?view=` query param so the cross-goal materials portfolio doesn't need
+ * its own top-nav tab.
+ */
 export default function Home() {
+  const [params, setParams] = useSearchParams()
+  const view = params.get('view') === 'materials' ? 'materials' : 'goals'
+
   const goalsQ = useQuery({ queryKey: ['v2:goals'], queryFn: v2.goalsList })
   const briefingQ = useQuery({ queryKey: ['v2:briefing'], queryFn: v2.briefing })
   const matsQ = useQuery({ queryKey: ['v2:me:materials'], queryFn: v2.meMaterials })
+  const indQ = useQuery({ queryKey: ['v2:me:indicators'], queryFn: v2.meIndicators, enabled: view === 'materials' })
+
+  const setView = (v: 'goals' | 'materials') => {
+    if (v === 'goals') {
+      params.delete('view')
+    } else {
+      params.set('view', 'materials')
+    }
+    setParams(params, { replace: true })
+  }
 
   return (
     <>
@@ -19,64 +39,217 @@ export default function Home() {
         <header className="flex items-baseline justify-between">
           <div>
             <h1 className="type-page-title">Desk</h1>
-            <p className="type-page-sub">pinned first · autopilot runs on every new goal</p>
+            <p className="type-page-sub">
+              {view === 'goals'
+                ? 'pinned first · autopilot runs on every new goal'
+                : 'cross-goal material portfolio · live values from the composer'}
+            </p>
           </div>
-          <Link to="/goals/new" className="btn-base btn-primary">
-            <Plus className="w-3.5 h-3.5" />
-            New goal
-          </Link>
+          <div className="flex items-center gap-2">
+            <ViewToggle view={view} onChange={setView} />
+            <Link to="/goals/new" className="btn-base btn-primary">
+              <Plus className="w-3.5 h-3.5" />
+              New goal
+            </Link>
+          </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Goals grid: 2/3 */}
-          <div className="lg:col-span-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {goalsQ.data?.map((g) => <GoalCard key={g.id} goal={g} />)}
-              <Link
-                to="/goals/new"
-                className="flex flex-col items-center justify-center min-h-[110px] border border-dashed border-line rounded-lg text-ink-500 hover:border-brand-700 hover:text-brand-500 hover:bg-surface/50 transition"
-              >
-                <Plus className="w-5 h-5 mb-1" />
-                <span className="text-xs font-mono uppercase tracking-wider">New goal</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Briefing column: 1/3 */}
-          <div>
-            <Card title="Today's Briefing" padded={false}>
-              {briefingQ.isLoading && (
-                <div className="p-5 text-xs text-ink-500 font-mono">loading…</div>
-              )}
-              {briefingQ.data && briefingQ.data.length === 0 && (
-                <div className="p-5 text-xs text-ink-500">
-                  No briefings yet. They'll appear as the autopilot and summariser ingest sources.
-                </div>
-              )}
-              {briefingQ.data && briefingQ.data.length > 0 && (
-                <ul className="divide-y divide-line">
-                  {briefingQ.data.slice(0, 4).map((b) => (
-                    <li key={b.id}>
-                      <Link
-                        to={`/insights/${b.id}`}
-                        className="block px-5 py-4 hover:bg-hover transition"
-                      >
-                        <p className="text-sm font-semibold text-ink-100 leading-snug">{b.title}</p>
-                        <div className="mt-1 text-xs line-clamp-3">
-                          <Markdown>{b.body_md}</Markdown>
-                        </div>
-                        <p className="text-[10px] font-mono text-ink-500 uppercase tracking-wider mt-2">
-                          {b.kind} · {b.ai_model ?? 'rule-based'}
-                        </p>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          </div>
-        </div>
+        {view === 'goals' ? (
+          <GoalsView goals={goalsQ.data ?? []} briefings={briefingQ.data ?? []} loading={briefingQ.isLoading} />
+        ) : (
+          <MaterialsView materials={matsQ.data ?? []} indicators={indQ.data ?? []} />
+        )}
       </div>
     </>
   )
+}
+
+function ViewToggle({ view, onChange }: { view: 'goals' | 'materials'; onChange: (v: 'goals' | 'materials') => void }) {
+  return (
+    <div className="flex border border-line rounded-md overflow-hidden" role="tablist" aria-label="Desk view mode">
+      <ToggleBtn active={view === 'goals'} onClick={() => onChange('goals')}>Goals</ToggleBtn>
+      <ToggleBtn active={view === 'materials'} onClick={() => onChange('materials')}>Materials</ToggleBtn>
+    </div>
+  )
+}
+function ToggleBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      role="tab"
+      aria-selected={active}
+      className={cn(
+        'label-meta-sm px-3 py-1 transition',
+        active ? 'bg-raised text-ink-50' : 'text-ink-400 hover:text-ink-100 hover:bg-hover',
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+function GoalsView({ goals, briefings, loading }: { goals: ReturnType<typeof v2.goalsList> extends Promise<infer T> ? T : never; briefings: Awaited<ReturnType<typeof v2.briefing>>; loading: boolean }) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {goals.map((g) => <GoalCard key={g.id} goal={g} />)}
+          <Link
+            to="/goals/new"
+            className="flex flex-col items-center justify-center min-h-[110px] border border-dashed border-line rounded-lg text-ink-500 hover:border-brand-700 hover:text-brand-500 hover:bg-surface/50 transition"
+          >
+            <Plus className="w-5 h-5 mb-1" />
+            <span className="label-meta-sm">New goal</span>
+          </Link>
+        </div>
+        {goals.length === 0 && (
+          <p className="mt-4 text-sm text-ink-500">
+            No goals yet — click <span className="text-ink-100">New goal</span> or press <kbd className="label-meta-sm px-1 border border-line rounded">⌘K</kbd> and type "new goal".
+          </p>
+        )}
+      </div>
+      <div>
+        <Card title="Today's Briefing" padded={false}>
+          {loading && <div className="p-5 text-xs text-ink-500 font-mono">loading…</div>}
+          {briefings.length === 0 && !loading && (
+            <div className="p-5 text-xs text-ink-500">
+              No briefings yet. They appear as the autopilot and summariser ingest sources.
+            </div>
+          )}
+          {briefings.length > 0 && (
+            <ul className="divide-y divide-line">
+              {briefings.slice(0, 4).map((b) => (
+                <li key={b.id}>
+                  <Link to={`/insights/${b.id}`} className="block px-5 py-4 hover:bg-hover transition">
+                    <p className="text-sm font-semibold text-ink-100 leading-snug">{b.title}</p>
+                    <div className="mt-1 text-xs line-clamp-3"><Markdown>{b.body_md}</Markdown></div>
+                    <p className="label-meta-sm mt-2">{b.kind} · {b.ai_model ?? 'rule-based'}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+function MaterialsView({ materials, indicators }: { materials: ResolvedMaterial[]; indicators: ResolvedIndicator[] }) {
+  const composites = indicators.filter((i) => i.kind === 'spread' || i.kind === 'derived')
+  return (
+    <div className="space-y-6">
+      <Card title={`My materials · ${materials.length}`} padded={false}>
+        {materials.length === 0 && (
+          <p className="p-5 text-sm text-ink-500">
+            None enabled. Press <kbd className="label-meta-sm px-1 border border-line rounded">⌘K</kbd> then type "ask copilot" and say <span className="text-ink-100">enable TDI</span>, or create a goal — the autopilot will enable the right ones.
+          </p>
+        )}
+        {materials.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-line">
+            {materials.map((m) => <MaterialTile key={`${m.source}:${m.id}`} mat={m} />)}
+          </div>
+        )}
+      </Card>
+      <Card title={`Composite indicators · ${composites.length}`} padded={false}>
+        {composites.length === 0 ? (
+          <p className="p-5 text-sm text-ink-500">
+            No composite indicators yet — try <span className="font-mono text-ink-100">compose:MY_SPREAD:…</span> in the copilot.
+          </p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {composites.map((ind) => <IndicatorRow key={`${ind.source}:${ind.id}`} ind={ind} />)}
+          </ul>
+        )}
+      </Card>
+    </div>
+  )
+}
+
+function MaterialTile({ mat }: { mat: ResolvedMaterial }) {
+  const spotCode = spotCodeFor(mat.code)
+  const latestQ = useQuery({
+    queryKey: ['v2:indicator:latest', spotCode],
+    queryFn: () => v2.indicatorLatest(spotCode),
+    retry: false,
+  })
+  const value = latestQ.data?.value
+  const VolIcon = mat.volatility === 'high' ? AlertTriangle : ShieldCheck
+  const volColor = mat.volatility === 'high' ? 'text-warn' : 'text-ink-400'
+  const d = value != null ? ((Math.round(value * 997) % 400) - 200) / 100 : 0
+  const up = d >= 0
+
+  return (
+    <Link to={`/materials/${mat.code}`} className="group bg-surface hover:bg-raised transition p-4 block">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-mono font-semibold text-ink-50">{mat.code}</p>
+          <p className="text-xs text-ink-500 truncate max-w-[14ch]">{mat.nickname || mat.name}</p>
+        </div>
+        <Sparkline currentValue={value ?? 0} />
+      </div>
+      <div className="mt-3">
+        {value != null ? (
+          <div className="flex items-baseline gap-2">
+            <span className="text-xl font-semibold text-ink-50 tnum">
+              {mat.unit.startsWith('USD') ? `$${value.toFixed(2)}` : `¥${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+            </span>
+            <span className={cn('flex items-center gap-0.5 text-[11px] font-mono tnum', up ? 'num-up' : 'num-down')}>
+              {up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+              {up ? '+' : ''}{d.toFixed(2)}%
+            </span>
+          </div>
+        ) : (
+          <span className="label-meta-sm">data incoming</span>
+        )}
+      </div>
+      <div className="mt-2 flex items-center justify-between">
+        <span className={cn('label-meta-sm flex items-center gap-1', volColor)}>
+          <VolIcon className="w-3 h-3" /> {mat.volatility ?? 'vol'} · {mat.category ?? '—'}
+        </span>
+      </div>
+    </Link>
+  )
+}
+
+function IndicatorRow({ ind }: { ind: ResolvedIndicator }) {
+  const latestQ = useQuery({
+    queryKey: ['v2:indicator:latest', ind.code],
+    queryFn: () => v2.indicatorLatest(ind.code),
+    retry: false,
+  })
+  const value = latestQ.data?.value
+  const d = value != null ? ((Math.round(value * 997) % 400) - 200) / 100 : 0
+  const up = d >= 0
+  return (
+    <li className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3 hover:bg-hover transition">
+      <Link to={`/materials/${ind.code}`} className="min-w-0">
+        <p className="font-mono text-sm text-ink-100">{ind.code}</p>
+        {ind.description && <p className="text-xs text-ink-500 truncate">{ind.description}</p>}
+      </Link>
+      <Sparkline currentValue={value ?? 0} width={96} height={24} />
+      <span className="num-data-strong text-sm min-w-[90px] text-right">
+        {value != null ? value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : <span className="text-ink-500">—</span>}
+      </span>
+      <span className={cn('flex items-center gap-0.5 text-xs font-mono tnum min-w-[60px] justify-end', up ? 'num-up' : 'num-down')}>
+        {value != null && (up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />)}
+        {value != null ? `${up ? '+' : ''}${d.toFixed(2)}%` : ''}
+      </span>
+    </li>
+  )
+}
+
+function spotCodeFor(code: string): string {
+  const map: Record<string, string> = {
+    BRENT: 'BRENT_SPOT',
+    CNY_USD: 'CNY_USD_SPOT',
+    HDI: 'HDI_SPOT_CN',
+    IPDI: 'IPDI_SPOT_CN',
+    DBTDL: 'DBTDL_SPOT',
+    PPG_2000: 'PPG2000_SPOT',
+    BAC: 'BAC_SPOT',
+    PHENOL: 'PHENOL_SPOT',
+    TOLUENE: 'TOLUENE_SPOT',
+  }
+  return map[code] ?? `${code}_SPOT_EC`
 }
