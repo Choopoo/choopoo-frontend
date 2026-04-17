@@ -69,12 +69,13 @@ export default function Products() {
 
 function ProductRow({ product: p }: { product: NonNullable<Awaited<ReturnType<typeof v2.catalogProducts>>>[number] }) {
   const localizedName = useLocalizedField(p, 'name')
+  const description = p.description
   return (
-    <li className="grid grid-cols-[auto_1fr_auto] gap-4 items-center px-5 py-3 hover:bg-hover transition">
+    <li className="grid grid-cols-[auto_1fr_auto] gap-4 items-center px-5 py-3 hover:bg-hover transition" title={p.code}>
       <Box className="w-4 h-4 text-brand-500" />
       <div className="min-w-0">
         <p className="text-sm font-semibold text-ink-50 truncate">{localizedName || p.code}</p>
-        <p className="text-xs text-ink-400 truncate font-mono">{p.code}</p>
+        {description && <p className="text-xs text-ink-400 truncate">{description}</p>}
       </div>
       <Badge variant="neutral">{p.default_region_code ?? 'CN-EC'}</Badge>
     </li>

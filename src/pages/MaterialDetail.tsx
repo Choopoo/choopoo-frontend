@@ -24,7 +24,7 @@ export default function MaterialDetail() {
         <p className="type-page-sub">{t('cards.spot_chart')}</p>
       </header>
 
-      <PriceChart code={spotCode} title={spotCode} />
+      <PriceChart code={spotCode} />
 
       <SignalMap subjectCode={code} />
     </div>

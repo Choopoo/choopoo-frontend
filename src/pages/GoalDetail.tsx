@@ -10,6 +10,7 @@ import { PriceChart } from '../components/PriceChart'
 import { SagaTimeline } from '../components/SagaTimeline'
 import { Markdown } from '../components/Markdown'
 import { useEnumLabel } from '../i18n/useEnumLabel'
+import { useLocalizedField } from '../i18n/useLocalizedField'
 
 export default function GoalDetail() {
   const { id } = useParams<{ id: string }>()
@@ -98,7 +99,7 @@ function GoalDetailInner({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2 space-y-5">
           {primary ? (
-            <PriceChart code={primary.indicator_code} title={`${primary.indicator_code}${t('detail.primary_driver_suffix')}`} />
+            <PriceChart code={primary.indicator_code} />
           ) : (
             <Card>
               <p className="text-sm text-ink-500 py-6 text-center font-mono">
@@ -188,10 +189,18 @@ function IndicatorTable({ links }: { links: GoalIndicatorLink[] }) {
 function IndicatorTableRow({ link: l, value, d, up }: { link: GoalIndicatorLink; value: number | undefined; d: number; up: boolean }) {
   const { i18n } = useTranslation()
   const roleLabel = useEnumLabel('indicator_role', l.role)
+  // Look up the catalog row for the localized name (cached query, so multi-row use is cheap).
+  const catalogQ = useQuery({
+    queryKey: ['v2:catalog:indicators'],
+    queryFn: v2.catalogIndicators,
+    staleTime: 60 * 60_000,
+  })
+  const meta = catalogQ.data?.find((i) => i.code === l.indicator_code)
+  const displayName = useLocalizedField(meta, 'name') || l.indicator_code
   return (
     <li className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 px-5 py-2.5">
-      <Link to={`/materials/${encodeURIComponent(l.indicator_code)}`} className="font-mono text-sm text-ink-100 hover:text-brand-500">
-        {l.indicator_code}
+      <Link to={`/materials/${encodeURIComponent(l.indicator_code)}`} className="text-sm text-ink-100 hover:text-brand-500" title={l.indicator_code}>
+        {displayName}
       </Link>
       <span className="font-mono text-sm text-ink-100 tnum">
         {value != null ? `¥${value.toLocaleString(i18n.language, { maximumFractionDigits: 0 })}` : <span className="text-ink-500">—</span>}

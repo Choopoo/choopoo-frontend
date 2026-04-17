@@ -2,22 +2,38 @@ import { useMemo, useState } from 'react'
 import {
   Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts'
+import { useTranslation } from 'react-i18next'
 import { v2 } from '../api/v2'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '../lib/utils'
+import { useLocalizedField } from '../i18n/useLocalizedField'
 
 /**
  * Full panel chart for a primary indicator. Pulls latest value via
  * /api/v2/indicators/:code/latest, then synthesises a plausible N-day series
  * for the visual pass. When /series is implemented, swap the synthesiser.
+ *
+ * Resolves its own localized title from the catalog so callers don't have to
+ * pre-thread a name. Falls back to the title prop if a caller wants a custom
+ * label (e.g. "TDI · primary driver").
  */
-export function PriceChart({ code, title, unit = 'CNY/ton' }: { code: string; title?: string; unit?: string }) {
+export function PriceChart({ code, title, unit }: { code: string; title?: string; unit?: string }) {
+  const { t } = useTranslation('common')
   const [range, setRange] = useState<7 | 30 | 90>(30)
   const latestQ = useQuery({
     queryKey: ['v2:indicator:latest', code],
     queryFn: () => v2.indicatorLatest(code),
     retry: false,
   })
+  const catalogQ = useQuery({
+    queryKey: ['v2:catalog:indicators'],
+    queryFn: v2.catalogIndicators,
+    staleTime: 60 * 60_000,
+  })
+  const meta = catalogQ.data?.find((i) => i.code === code)
+  const localizedName = useLocalizedField(meta, 'name')
+  const resolvedTitle = title || localizedName || code
+  const resolvedUnit = unit || meta?.unit || 'CNY/ton'
 
   const data = useMemo(() => {
     if (latestQ.data?.value == null) return []
@@ -32,18 +48,18 @@ export function PriceChart({ code, title, unit = 'CNY/ton' }: { code: string; ti
   const color = up ? 'var(--color-up)' : 'var(--color-down)'
 
   return (
-    <section className="bg-surface border border-line rounded-lg">
+    <section className="bg-surface border border-line rounded-lg" title={code}>
       <header className="flex items-end justify-between p-5 pb-3">
         <div>
-          <p className="text-xs text-ink-400 font-mono uppercase tracking-wider">{title || code}</p>
+          <p className="text-xs text-ink-400 uppercase tracking-wider">{resolvedTitle}</p>
           <div className="flex items-baseline gap-3 mt-1">
             <span className="text-display-sm font-semibold text-ink-50 tnum">
-              {current != null ? fmt(current, unit) : '—'}
+              {current != null ? fmt(current, resolvedUnit) : '—'}
             </span>
-            <span className="text-xs text-ink-400 tnum">/{unit.split('/')[1] ?? 'unit'}</span>
+            <span className="text-xs text-ink-400 tnum">/{resolvedUnit.split('/')[1] ?? 'unit'}</span>
             {current != null && (
               <span className={`text-sm font-mono tnum ${up ? 'text-up' : 'text-down'}`}>
-                {up ? '+' : ''}{delta.toFixed(0)} ({up ? '+' : ''}{deltaPct.toFixed(2)}%) {range}d
+                {up ? '+' : ''}{delta.toFixed(0)} ({up ? '+' : ''}{deltaPct.toFixed(2)}%) {t('units.days_short', { count: range })}
               </span>
             )}
           </div>
@@ -60,7 +76,7 @@ export function PriceChart({ code, title, unit = 'CNY/ton' }: { code: string; ti
                   : 'text-ink-400 hover:text-ink-100 hover:bg-hover',
               )}
             >
-              {d}d
+              {t('units.days_short', { count: d })}
             </button>
           ))}
         </div>
@@ -86,7 +102,7 @@ export function PriceChart({ code, title, unit = 'CNY/ton' }: { code: string; ti
               <YAxis
                 domain={['auto', 'auto']}
                 tick={{ fontSize: 10, fill: 'var(--color-ink-500)', fontFamily: 'var(--font-mono)' }}
-                tickFormatter={(v) => shortNum(v, unit)}
+                tickFormatter={(v) => shortNum(v, resolvedUnit)}
                 axisLine={false}
                 tickLine={false}
                 width={56}
@@ -101,7 +117,7 @@ export function PriceChart({ code, title, unit = 'CNY/ton' }: { code: string; ti
                   color: 'var(--color-ink-100)',
                 }}
                 labelStyle={{ color: 'var(--color-ink-400)' }}
-                formatter={(v) => [`${fmt(Number(v), unit)}`, code]}
+                formatter={(v) => [`${fmt(Number(v), resolvedUnit)}`, resolvedTitle]}
               />
               <Area
                 type="monotone"
@@ -116,7 +132,7 @@ export function PriceChart({ code, title, unit = 'CNY/ton' }: { code: string; ti
           </ResponsiveContainer>
         ) : (
           <div className="h-full flex items-center justify-center text-ink-500 text-sm font-mono">
-            {latestQ.isLoading ? 'loading…' : 'no recent reading'}
+            {latestQ.isLoading ? t('states.loading') : t('states.no_data')}
           </div>
         )}
       </div>

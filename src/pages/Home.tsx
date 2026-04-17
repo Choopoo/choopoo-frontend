@@ -236,16 +236,10 @@ function IndicatorRow({ ind }: { ind: ResolvedIndicator }) {
   const value = latestQ.data?.value
   const d = value != null ? ((Math.round(value * 997) % 400) - 200) / 100 : 0
   const up = d >= 0
-  const showCodeChip = displayName !== ind.code
   return (
     <li className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3 hover:bg-hover transition">
-      <Link to={`/materials/${ind.code}`} className="min-w-0 group">
-        <div className="flex items-baseline gap-2 min-w-0">
-          <p className="text-sm font-semibold text-ink-50 group-hover:text-brand-500 transition truncate">{displayName}</p>
-          {showCodeChip && (
-            <span className="font-mono text-[10px] text-ink-500 flex-shrink-0">{ind.code}</span>
-          )}
-        </div>
+      <Link to={`/materials/${ind.code}`} className="min-w-0 group" title={ind.code}>
+        <p className="text-sm font-semibold text-ink-50 group-hover:text-brand-500 transition truncate">{displayName}</p>
         {description && <p className="text-xs text-ink-400 truncate mt-0.5">{description}</p>}
       </Link>
       <Sparkline currentValue={value ?? 0} width={96} height={24} />

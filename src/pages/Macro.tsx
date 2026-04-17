@@ -57,11 +57,8 @@ function RegulatoryRow({ ind: r }: { ind: CatalogIndicator }) {
   const displayName = useLocalizedField(r, 'name') || r.code
   const description = useLocalizedField(r, 'description')
   return (
-    <li className="px-5 py-3">
-      <div className="flex items-baseline gap-2">
-        <p className="text-sm font-semibold text-ink-50">{displayName}</p>
-        {displayName !== r.code && <p className="font-mono text-[10px] text-ink-500">{r.code}</p>}
-      </div>
+    <li className="px-5 py-3" title={r.code}>
+      <p className="text-sm font-semibold text-ink-50">{displayName}</p>
       {description && <p className="text-xs text-ink-400 mt-0.5">{description}</p>}
       <p className="label-meta-sm mt-1">{r.region_code ?? 'GLOBAL'}</p>
     </li>

@@ -204,25 +204,20 @@ function IndicatorOption({ ind, picked, onClick }: { ind: CatalogIndicator; pick
   const displayName = useLocalizedField(ind, 'name') || ind.code
   const description = useLocalizedField(ind, 'description')
   const kindLabel = useEnumLabel('indicator_kind', ind.kind)
-  const showCodeChip = displayName !== ind.code
   return (
     <li>
       <button
         onClick={onClick}
+        title={ind.code}
         className={cn(
           'w-full text-left p-3 border rounded-md transition',
           picked ? 'border-brand-500 bg-brand-50/40' : 'border-line bg-surface hover:border-line-strong hover:bg-raised',
         )}
       >
         <div className="flex items-baseline justify-between gap-2">
-          <div className="flex items-baseline gap-2 min-w-0">
-            <span className={cn('text-sm font-medium truncate', picked ? 'text-brand-500' : 'text-ink-50')}>
-              {displayName}
-            </span>
-            {showCodeChip && (
-              <span className="font-mono text-[10px] text-ink-500 flex-shrink-0">{ind.code}</span>
-            )}
-          </div>
+          <span className={cn('text-sm font-medium truncate', picked ? 'text-brand-500' : 'text-ink-50')}>
+            {displayName}
+          </span>
           <span className="text-[10px] font-mono uppercase tracking-wider text-ink-500 flex-shrink-0">
             {kindLabel}
           </span>
