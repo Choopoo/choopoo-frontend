@@ -1,0 +1,61 @@
+{
+  "app_name": "Choopoo",
+  "nav": {
+    "desk": "Desk",
+    "ask": "Ask",
+    "materials": "Materials",
+    "products": "Products",
+    "macro": "Macro",
+    "sources": "Sources",
+    "status": "Status",
+    "copilot": "Copilot",
+    "command_palette": "Command palette",
+    "command_palette_hint": "⌘K"
+  },
+  "actions": {
+    "new_goal": "New goal",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "submit": "Submit",
+    "save": "Save",
+    "done": "Done",
+    "back": "Back",
+    "open": "Open",
+    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
+    "switch_language": "Switch language",
+    "logout": "Log out"
+  },
+  "states": {
+    "loading": "loading…",
+    "saving": "saving…",
+    "no_data": "no data",
+    "data_incoming": "data incoming",
+    "empty": "(empty)",
+    "error": "error",
+    "ok": "OK",
+    "degraded": "DEGRADED",
+    "down": "DOWN",
+    "checking": "CHECKING"
+  },
+  "units": {
+    "days_short": "{{count}}d",
+    "days_horizon": "{{count}}d horizon"
+  },
+  "footer": {
+    "ask_copilot_to": "Ask the copilot",
+    "or": "or"
+  },
+  "sources": {
+    "subtitle": "crawl queue · adapters · rss feeds",
+    "results_title": "Crawled results · {{count}}",
+    "filter_all": "All",
+    "col_source": "Source",
+    "col_material": "Material",
+    "col_title": "Title",
+    "col_score": "Score",
+    "col_crawled": "Crawled",
+    "empty": "No v1 crawl results (org 0 sentinel). Submit a URL below."
+  }
+}

@@ -100,7 +100,7 @@
   --color-ink-100: var(--color-neutral-100);   /* body copy */
   --color-ink-200: var(--color-neutral-200);   /* secondary body */
   --color-ink-400: var(--color-neutral-300);   /* labels, captions */
-  --color-ink-500: var(--color-neutral-400);   /* placeholders, hints */
+  --color-ink-500: var(--color-neutral-300);   /* placeholders, hints — AA on canvas (5.74:1) */
   --color-ink-700: var(--color-neutral-500);   /* dividers-as-text */
   --color-ink-900: var(--color-neutral-950);   /* legacy alias (rare use) */
 

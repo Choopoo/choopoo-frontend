@@ -1,0 +1,53 @@
+{
+  "page": {
+    "title": "原料",
+    "subtitle": "采购视角 · 数据由 composer 实时计算 · 折线为 28 天走势"
+  },
+  "products_page": {
+    "title": "产品",
+    "subtitle": "销售视角 · 你能生产的成品 + 下游需求走向",
+    "finished_products": "成品列表 · {{count}}",
+    "catalog_empty": "目录为空。",
+    "demand_signals": "区域需求信号 · 示例数据",
+    "demand_commentary": "需求点评",
+    "demand_lines": {
+      "0": "家具出口同比在华东与华南为正 → 木器涂料固化剂（TDI-75）二季度需求稳健。",
+      "1": "华北汽车产量走弱 — 脂肪族修补漆需求是边际变量，关注 HDI 对 TDI 溢价以判断利润信号。",
+      "2": "华东与华南建筑业 PMI > 50 支撑单组分湿固化 PU 胶粘剂出货；华北低于 50 表明轻微放缓。"
+    },
+    "demand_caveat": "点评为规则生成。后续需求爬虫上线后由预测器与事件抽取替代。"
+  },
+  "macro_page": {
+    "title": "宏观",
+    "subtitle": "原油 · 汇率 · 需求 PMI · 政策动态 · 全租户共用"
+  },
+  "cards": {
+    "my_materials": "我的原料 · {{count}}",
+    "composite_indicators": "组合指标 · {{count}}",
+    "regulatory_watchlist": "政策观察 · {{count}}",
+    "macro_series": "宏观数据 · {{count}}",
+    "spot_chart": "现货走势 · 信号地图 · 因果链"
+  },
+  "row": {
+    "category": "{{category}}",
+    "data_incoming": "数据加载中"
+  },
+  "signal_map": {
+    "title": "信号地图 · {{subject}}",
+    "active_count": "{{count}} 启用",
+    "candidate_count": "{{count}} 候选",
+    "active_section": "已启用 · 用于驱动洞察",
+    "candidate_section": "候选 · 点击审阅",
+    "no_active": "尚未启用任何信号 — 请从下方候选中选择。",
+    "no_candidates": "暂无候选信号 — 让助理对该主题进行扫描。",
+    "drawer": {
+      "induction_chain": "因果链",
+      "example_events": "历史事件",
+      "evidence_verified": "证据已核实",
+      "evidence_unverified": "证据尚未核实",
+      "activate": "启用",
+      "deactivate": "移回候选",
+      "score": "评分 {{score}}"
+    }
+  }
+}

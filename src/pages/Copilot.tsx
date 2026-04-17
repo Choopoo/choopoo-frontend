@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Send, Wrench, ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { v2, type CopilotResponse } from '../api/v2'
+import { PageHeader } from '../components/PageHeader'
 
 type Turn =
   | { role: 'user'; text: string }
@@ -15,6 +17,7 @@ const SUGGESTIONS = [
 ]
 
 export default function Copilot() {
+  const { t } = useTranslation('copilot')
   const [input, setInput] = useState('')
   const [turns, setTurns] = useState<Turn[]>([])
   const qc = useQueryClient()
@@ -48,12 +51,15 @@ export default function Copilot() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-6 flex flex-col" style={{ height: 'calc(100vh - 56px)' }}>
-      <header className="mb-4">
-        <h1 className="text-xl font-semibold text-ink-50 tracking-tight">Copilot</h1>
-        <p className="text-xs font-mono text-ink-500 mt-1 uppercase tracking-wider">
-          stub mode when <span className="text-brand-500">ANTHROPIC_API_KEY</span> unset · every tool call hits gateway with your org_id
-        </p>
-      </header>
+      <PageHeader
+        className="mb-4"
+        title={t('page.title')}
+        subtitle={
+          <>
+            {t('page.subtitle_prefix')}<span className="text-brand-500">{t('page.env_var_label')}</span>{t('page.subtitle_suffix')}
+          </>
+        }
+      />
 
       <div
         ref={scrollRef}
@@ -61,8 +67,8 @@ export default function Copilot() {
       >
         {turns.length === 0 && (
           <div className="text-center text-ink-500 py-8 font-mono">
-            <p className="text-[11px] uppercase tracking-widest">awaiting input</p>
-            <p className="mt-1">try one of the suggestions below ↓</p>
+            <p className="text-[11px] uppercase tracking-widest">{t('empty.awaiting_input')}</p>
+            <p className="mt-1">{t('empty.try_one_below')}</p>
           </div>
         )}
         {turns.map((t, i) =>
@@ -101,11 +107,11 @@ export default function Copilot() {
         {mut.isPending && (
           <div className="my-3 flex items-center gap-2 text-ink-400">
             <span className="text-brand-500 animate-pulse">▸</span>
-            <span>thinking…</span>
+            <span>{t('input.thinking')}</span>
           </div>
         )}
         {mut.isError && (
-          <div className="my-3 text-down">error: {(mut.error as Error).message}</div>
+          <div className="my-3 text-down">{(mut.error as Error).message}</div>
         )}
       </div>
 
@@ -128,13 +134,13 @@ export default function Copilot() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="ask or run a stub command…"
+          placeholder={t('input.placeholder')}
           className="flex-1 bg-transparent py-2.5 text-sm font-mono text-ink-50 placeholder:text-ink-500 outline-none"
           disabled={mut.isPending}
         />
         <button type="submit" disabled={mut.isPending || !input.trim()} className="btn-base btn-primary my-1.5">
           <Send className="w-3 h-3" />
-          Send
+          {t('input.send')}
         </button>
       </form>
     </div>

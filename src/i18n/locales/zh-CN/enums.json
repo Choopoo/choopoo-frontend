@@ -1,0 +1,70 @@
+{
+  "lens": {
+    "buy": "采购",
+    "sell": "销售",
+    "macro": "宏观",
+    "mixed": "综合"
+  },
+  "lens_hint": {
+    "buy": "原料采购成本",
+    "sell": "成品需求",
+    "macro": "原油、汇率、政策",
+    "mixed": "多视角综合"
+  },
+  "indicator_kind": {
+    "price": "价格",
+    "demand": "需求",
+    "supply": "供应",
+    "macro": "宏观",
+    "regulatory": "政策",
+    "spread": "价差",
+    "derived": "衍生"
+  },
+  "indicator_role": {
+    "primary": "主驱动",
+    "driver": "驱动因子",
+    "context": "背景"
+  },
+  "indicator_source": {
+    "catalog": "目录",
+    "catalog+override": "目录·覆盖",
+    "private": "私有"
+  },
+  "aspect_status": {
+    "active": "已启用",
+    "candidate": "候选",
+    "rejected": "已拒绝"
+  },
+  "aspect_code": {
+    "price": "价格",
+    "supply_event": "装置事件",
+    "shipping": "航运",
+    "regulatory": "政策",
+    "weather": "天气",
+    "trade_flow": "贸易流",
+    "geopolitics": "地缘",
+    "demand_proxy": "需求代理",
+    "capacity_news": "产能动态",
+    "macro_fx": "宏观汇率"
+  },
+  "insight_kind": {
+    "briefing": "速报",
+    "alert": "提醒",
+    "forecast": "预测",
+    "event": "事件",
+    "recommendation": "建议"
+  },
+  "workflow_state": {
+    "planning": "规划中",
+    "running": "执行中",
+    "succeeded": "成功",
+    "failed": "失败",
+    "compensating": "回滚中",
+    "compensated": "已回滚"
+  },
+  "volatility": {
+    "high": "高波动",
+    "medium": "中波动",
+    "low": "低波动"
+  }
+}

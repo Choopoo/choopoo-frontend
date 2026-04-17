@@ -2,26 +2,28 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ShoppingBag, ShoppingCart, Globe2, GitMerge, ArrowRight, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { v2, type CatalogIndicator, type Goal } from '../api/v2'
 import { Card } from '../components/Card'
 import { cn } from '../lib/utils'
+import { useLocalizedField } from '../i18n/useLocalizedField'
+import { useEnumLabel } from '../i18n/useEnumLabel'
 
-const LENSES = [
-  { code: 'buy' as const, label: 'Buy', icon: ShoppingCart, hint: 'Costs to procure raw materials' },
-  { code: 'sell' as const, label: 'Sell', icon: ShoppingBag, hint: 'Demand for finished products' },
-  { code: 'macro' as const, label: 'Macro', icon: Globe2, hint: 'Crude, FX, regulatory' },
-  { code: 'mixed' as const, label: 'Mixed', icon: GitMerge, hint: 'Touches multiple lenses' },
-]
+const LENS_CODES = ['buy', 'sell', 'macro', 'mixed'] as const
+const LENS_ICONS = { buy: ShoppingCart, sell: ShoppingBag, macro: Globe2, mixed: GitMerge }
 
 export default function GoalNew() {
   const nav = useNavigate()
   const qc = useQueryClient()
+  const { t } = useTranslation('goals')
+  const tCommon = useTranslation().t
   const [step, setStep] = useState<1 | 2>(1)
   const [title, setTitle] = useState('')
   const [lens, setLens] = useState<Goal['lens']>('buy')
   const [horizon, setHorizon] = useState<string>('90')
   const [createdGoalId, setCreatedGoalId] = useState<number | null>(null)
   const [pickedIds, setPickedIds] = useState<Set<number>>(new Set())
+  const lensLabel = useEnumLabel('lens', lens)
 
   const indicatorsQ = useQuery({
     queryKey: ['v2:catalog:indicators'],
@@ -75,9 +77,13 @@ export default function GoalNew() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-6 space-y-5">
       <header>
-        <h1 className="type-page-title">New goal</h1>
+        <h1 className="type-page-title">{t('wizard.title')}</h1>
         <p className="type-page-sub">
-          step {step} of 2 — {step === 1 ? 'name your goal' : 'pick driver indicators'}
+          {t('wizard.step', {
+            current: step,
+            total: 2,
+            label: step === 1 ? t('wizard.step_label_name') : t('wizard.step_label_pick'),
+          })}
         </p>
       </header>
 
@@ -85,44 +91,26 @@ export default function GoalNew() {
         <Card>
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="label-meta block mb-1.5">Title</label>
+              <label className="label-meta block mb-1.5">{t('wizard.title_label')}</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Cut TDI procurement cost 5% before Q4"
+                placeholder={t('wizard.title_placeholder')}
                 className="input-base"
                 autoFocus
               />
             </div>
             <div>
-              <label className="label-meta block mb-2">Lens</label>
+              <label className="label-meta block mb-2">{t('wizard.lens_label')}</label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {LENSES.map(({ code, label, icon: Icon, hint }) => (
-                  <button
-                    key={code}
-                    type="button"
-                    onClick={() => setLens(code)}
-                    className={cn(
-                      'flex flex-col items-start gap-1 p-3 border rounded-md text-left transition',
-                      lens === code
-                        ? 'border-brand-500 bg-brand-50/40'
-                        : 'border-line bg-surface hover:border-line-strong hover:bg-raised',
-                    )}
-                  >
-                    <span className={cn(
-                      'flex items-center gap-1.5 text-sm font-medium',
-                      lens === code ? 'text-brand-500' : 'text-ink-100',
-                    )}>
-                      <Icon className="w-4 h-4" /> {label}
-                    </span>
-                    <span className="text-xs text-ink-400">{hint}</span>
-                  </button>
+                {LENS_CODES.map((code) => (
+                  <LensOption key={code} code={code} active={lens === code} onClick={() => setLens(code)} />
                 ))}
               </div>
             </div>
             <div>
-              <label className="label-meta block mb-1.5">Horizon (days)</label>
+              <label className="label-meta block mb-1.5">{t('wizard.horizon_label')}</label>
               <input
                 type="number"
                 value={horizon}
@@ -134,10 +122,10 @@ export default function GoalNew() {
             </div>
             <div className="flex justify-between items-center pt-2 border-t border-line">
               <Link to="/" className="text-xs font-mono uppercase tracking-wider text-ink-500 hover:text-ink-100">
-                Cancel
+                {tCommon('actions.cancel')}
               </Link>
               <button type="submit" disabled={!title.trim() || createMut.isPending} className="btn-base btn-primary">
-                {createMut.isPending ? 'Creating…' : 'Continue'}
+                {createMut.isPending ? t('wizard.creating') : tCommon('actions.continue')}
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -153,64 +141,97 @@ export default function GoalNew() {
           title={
             <span className="flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-              Suggested for "{lens}"
+              {t('wizard.suggested_for', { lens: lensLabel })}
             </span>
           }
           action={
             <button onClick={finish} disabled={linkMut.isPending} className="btn-base btn-primary">
-              Done · {pickedIds.size} picked
+              {t('wizard.done_picked', { count: pickedIds.size })}
             </button>
           }
         >
-          {indicatorsQ.isLoading && <p className="text-sm text-ink-500 font-mono">loading…</p>}
+          {indicatorsQ.isLoading && <p className="text-sm text-ink-500 font-mono">{tCommon('states.loading')}</p>}
           {indicatorsQ.isError && (
             <p className="text-sm text-down font-mono">{(indicatorsQ.error as Error).message}</p>
           )}
           {indicatorsQ.data && (
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {suggestedIndicators.map((ind) => {
-                const picked = pickedIds.has(ind.id)
-                return (
-                  <li key={ind.id}>
-                    <button
-                      onClick={() => togglePick(ind.id)}
-                      className={cn(
-                        'w-full text-left p-3 border rounded-md transition',
-                        picked
-                          ? 'border-brand-500 bg-brand-50/40'
-                          : 'border-line bg-surface hover:border-line-strong hover:bg-raised',
-                      )}
-                    >
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className={cn(
-                          'font-mono text-sm font-medium truncate',
-                          picked ? 'text-brand-500' : 'text-ink-50',
-                        )}>
-                          {ind.code}
-                        </span>
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-ink-500 flex-shrink-0">
-                          {ind.kind}
-                        </span>
-                      </div>
-                      {ind.description && (
-                        <p className="text-xs text-ink-400 mt-1 line-clamp-2">{ind.description}</p>
-                      )}
-                    </button>
-                  </li>
-                )
-              })}
+              {suggestedIndicators.map((ind) => (
+                <IndicatorOption
+                  key={ind.id}
+                  ind={ind}
+                  picked={pickedIds.has(ind.id)}
+                  onClick={() => togglePick(ind.id)}
+                />
+              ))}
             </ul>
           )}
           <p className="mt-4 text-xs text-ink-500 border-t border-line pt-3">
-            Don't see what you need?{' '}
+            {t('wizard.dont_see')}{' '}
             <Link to="/copilot" className="text-brand-500 underline">
-              Ask the copilot
+              {tCommon('footer.ask_copilot_to')}
             </Link>{' '}
-            to add a private one.
+            {t('wizard.ask_copilot_to_add_private')}
           </p>
         </Card>
       )}
     </div>
+  )
+}
+
+function LensOption({ code, active, onClick }: { code: typeof LENS_CODES[number]; active: boolean; onClick: () => void }) {
+  const Icon = LENS_ICONS[code]
+  const label = useEnumLabel('lens', code)
+  const hint = useEnumLabel('lens_hint', code)
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex flex-col items-start gap-1 p-3 border rounded-md text-left transition',
+        active ? 'border-brand-500 bg-brand-50/40' : 'border-line bg-surface hover:border-line-strong hover:bg-raised',
+      )}
+    >
+      <span className={cn('flex items-center gap-1.5 text-sm font-medium', active ? 'text-brand-500' : 'text-ink-100')}>
+        <Icon className="w-4 h-4" /> {label}
+      </span>
+      <span className="text-xs text-ink-400">{hint}</span>
+    </button>
+  )
+}
+
+function IndicatorOption({ ind, picked, onClick }: { ind: CatalogIndicator; picked: boolean; onClick: () => void }) {
+  const displayName = useLocalizedField(ind, 'name') || ind.code
+  const description = useLocalizedField(ind, 'description')
+  const kindLabel = useEnumLabel('indicator_kind', ind.kind)
+  const showCodeChip = displayName !== ind.code
+  return (
+    <li>
+      <button
+        onClick={onClick}
+        className={cn(
+          'w-full text-left p-3 border rounded-md transition',
+          picked ? 'border-brand-500 bg-brand-50/40' : 'border-line bg-surface hover:border-line-strong hover:bg-raised',
+        )}
+      >
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="flex items-baseline gap-2 min-w-0">
+            <span className={cn('text-sm font-medium truncate', picked ? 'text-brand-500' : 'text-ink-50')}>
+              {displayName}
+            </span>
+            {showCodeChip && (
+              <span className="font-mono text-[10px] text-ink-500 flex-shrink-0">{ind.code}</span>
+            )}
+          </div>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-ink-500 flex-shrink-0">
+            {kindLabel}
+          </span>
+        </div>
+        {description && (
+          <p className="text-xs text-ink-400 mt-1 line-clamp-2">{description}</p>
+        )}
+      </button>
+    </li>
   )
 }
 

@@ -1,0 +1,24 @@
+{
+  "wizard": {
+    "title": "New goal",
+    "step": "step {{current}} of {{total}} — {{label}}",
+    "step_label_name": "name your goal",
+    "step_label_pick": "pick driver indicators",
+    "title_label": "Title",
+    "title_placeholder": "e.g. Cut TDI procurement cost 5% before Q4",
+    "lens_label": "Lens",
+    "horizon_label": "Horizon (days)",
+    "creating": "Creating…",
+    "suggested_for": "Suggested for \"{{lens}}\"",
+    "done_picked": "Done · {{count}} picked",
+    "ask_copilot_to_add_private": "to add a private one.",
+    "dont_see": "Don't see what you need?"
+  },
+  "detail": {
+    "back": "Desk",
+    "primary_driver_suffix": " · primary driver",
+    "saga_no_run": "No primary indicator yet — saga may still be running.",
+    "indicators": "Indicators · {{count}}",
+    "pinned_badge": "pinned"
+  }
+}

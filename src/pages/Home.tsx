@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AlertTriangle, Plus, ShieldCheck, TrendingDown, TrendingUp } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { v2, type ResolvedIndicator, type ResolvedMaterial } from '../api/v2'
 import { GoalCard } from '../components/GoalCard'
 import { TickerStrip } from '../components/TickerStrip'
@@ -8,6 +9,8 @@ import { Markdown } from '../components/Markdown'
 import { Card } from '../components/Card'
 import { Sparkline } from '../components/Sparkline'
 import { cn } from '../lib/utils'
+import { useLocalizedField } from '../i18n/useLocalizedField'
+import { useEnumLabel } from '../i18n/useEnumLabel'
 
 /**
  * Desk is the single consumption surface. Supports two view modes via
@@ -32,24 +35,26 @@ export default function Home() {
     setParams(params, { replace: true })
   }
 
+  const { t } = useTranslation('desk')
+  const tCommon = useTranslation().t
   return (
     <>
       <TickerStrip materials={matsQ.data ?? []} />
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
         <header className="flex items-baseline justify-between">
           <div>
-            <h1 className="type-page-title">Desk</h1>
+            <h1 className="type-page-title">{t('page.title')}</h1>
             <p className="type-page-sub">
               {view === 'goals'
-                ? 'pinned first · autopilot runs on every new goal'
-                : 'cross-goal material portfolio · live values from the composer'}
+                ? t('page.subtitle')
+                : t('page.subtitle_materials', { defaultValue: 'cross-goal material portfolio · live values from the composer' })}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <ViewToggle view={view} onChange={setView} />
             <Link to="/goals/new" className="btn-base btn-primary">
               <Plus className="w-3.5 h-3.5" />
-              New goal
+              {tCommon('actions.new_goal')}
             </Link>
           </div>
         </header>
@@ -65,10 +70,11 @@ export default function Home() {
 }
 
 function ViewToggle({ view, onChange }: { view: 'goals' | 'materials'; onChange: (v: 'goals' | 'materials') => void }) {
+  const { t } = useTranslation('desk')
   return (
-    <div className="flex border border-line rounded-md overflow-hidden" role="tablist" aria-label="Desk view mode">
-      <ToggleBtn active={view === 'goals'} onClick={() => onChange('goals')}>Goals</ToggleBtn>
-      <ToggleBtn active={view === 'materials'} onClick={() => onChange('materials')}>Materials</ToggleBtn>
+    <div className="flex border border-line rounded-md overflow-hidden" role="tablist">
+      <ToggleBtn active={view === 'goals'} onClick={() => onChange('goals')}>{t('tabs.goals')}</ToggleBtn>
+      <ToggleBtn active={view === 'materials'} onClick={() => onChange('materials')}>{t('tabs.materials')}</ToggleBtn>
     </div>
   )
 }
@@ -89,6 +95,8 @@ function ToggleBtn({ active, onClick, children }: { active: boolean; onClick: ()
 }
 
 function GoalsView({ goals, briefings, loading }: { goals: ReturnType<typeof v2.goalsList> extends Promise<infer T> ? T : never; briefings: Awaited<ReturnType<typeof v2.briefing>>; loading: boolean }) {
+  const { t } = useTranslation('desk')
+  const tCommon = useTranslation().t
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2">
@@ -99,33 +107,25 @@ function GoalsView({ goals, briefings, loading }: { goals: ReturnType<typeof v2.
             className="flex flex-col items-center justify-center min-h-[110px] border border-dashed border-line rounded-lg text-ink-500 hover:border-brand-700 hover:text-brand-500 hover:bg-surface/50 transition"
           >
             <Plus className="w-5 h-5 mb-1" />
-            <span className="label-meta-sm">New goal</span>
+            <span className="label-meta-sm">{tCommon('actions.new_goal')}</span>
           </Link>
         </div>
         {goals.length === 0 && (
           <p className="mt-4 text-sm text-ink-500">
-            No goals yet — click <span className="text-ink-100">New goal</span> or press <kbd className="label-meta-sm px-1 border border-line rounded">⌘K</kbd> and type "new goal".
+            {t('empty.no_goals', { defaultValue: 'No goals yet — click New goal above or open the command palette (⌘K).' })}
           </p>
         )}
       </div>
       <div>
-        <Card title="Today's Briefing" padded={false}>
-          {loading && <div className="p-5 text-xs text-ink-500 font-mono">loading…</div>}
+        <Card title={t('cards.todays_briefing')} padded={false}>
+          {loading && <div className="p-5 text-xs text-ink-500 font-mono">{tCommon('states.loading')}</div>}
           {briefings.length === 0 && !loading && (
-            <div className="p-5 text-xs text-ink-500">
-              No briefings yet. They appear as the autopilot and summariser ingest sources.
-            </div>
+            <div className="p-5 text-xs text-ink-500">{t('cards.todays_briefing_empty')}</div>
           )}
           {briefings.length > 0 && (
             <ul className="divide-y divide-line">
               {briefings.slice(0, 4).map((b) => (
-                <li key={b.id}>
-                  <Link to={`/insights/${b.id}`} className="block px-5 py-4 hover:bg-hover transition">
-                    <p className="text-sm font-semibold text-ink-100 leading-snug">{b.title}</p>
-                    <div className="mt-1 text-xs line-clamp-3"><Markdown>{b.body_md}</Markdown></div>
-                    <p className="label-meta-sm mt-2">{b.kind} · {b.ai_model ?? 'rule-based'}</p>
-                  </Link>
-                </li>
+                <BriefingItem key={b.id} briefing={b} />
               ))}
             </ul>
           )}
@@ -135,15 +135,27 @@ function GoalsView({ goals, briefings, loading }: { goals: ReturnType<typeof v2.
   )
 }
 
+function BriefingItem({ briefing: b }: { briefing: Awaited<ReturnType<typeof v2.briefing>>[number] }) {
+  const kindLabel = useEnumLabel('insight_kind', b.kind)
+  return (
+    <li>
+      <Link to={`/insights/${b.id}`} className="block px-5 py-4 hover:bg-hover transition">
+        <p className="text-sm font-semibold text-ink-100 leading-snug">{b.title}</p>
+        <div className="mt-1 text-xs line-clamp-3"><Markdown>{b.body_md}</Markdown></div>
+        <p className="label-meta-sm mt-2">{kindLabel} · {b.ai_model ?? 'rule-based'}</p>
+      </Link>
+    </li>
+  )
+}
+
 function MaterialsView({ materials, indicators }: { materials: ResolvedMaterial[]; indicators: ResolvedIndicator[] }) {
+  const { t } = useTranslation('desk')
   const composites = indicators.filter((i) => i.kind === 'spread' || i.kind === 'derived')
   return (
     <div className="space-y-6">
-      <Card title={`My materials · ${materials.length}`} padded={false}>
+      <Card title={t('cards.my_materials', { count: materials.length })} padded={false}>
         {materials.length === 0 && (
-          <p className="p-5 text-sm text-ink-500">
-            None enabled. Press <kbd className="label-meta-sm px-1 border border-line rounded">⌘K</kbd> then type "ask copilot" and say <span className="text-ink-100">enable TDI</span>, or create a goal — the autopilot will enable the right ones.
-          </p>
+          <p className="p-5 text-sm text-ink-500">{t('cards.my_materials_empty_prompt')}</p>
         )}
         {materials.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-line">
@@ -151,11 +163,9 @@ function MaterialsView({ materials, indicators }: { materials: ResolvedMaterial[
           </div>
         )}
       </Card>
-      <Card title={`Composite indicators · ${composites.length}`} padded={false}>
+      <Card title={t('cards.composite_indicators', { count: composites.length })} padded={false}>
         {composites.length === 0 ? (
-          <p className="p-5 text-sm text-ink-500">
-            No composite indicators yet — try <span className="font-mono text-ink-100">compose:MY_SPREAD:…</span> in the copilot.
-          </p>
+          <p className="p-5 text-sm text-ink-500">{t('cards.composite_indicators_empty_prompt')}</p>
         ) : (
           <ul className="divide-y divide-line">
             {composites.map((ind) => <IndicatorRow key={`${ind.source}:${ind.id}`} ind={ind} />)}
@@ -167,6 +177,9 @@ function MaterialsView({ materials, indicators }: { materials: ResolvedMaterial[
 }
 
 function MaterialTile({ mat }: { mat: ResolvedMaterial }) {
+  const { i18n } = useTranslation()
+  const tCommon = useTranslation().t
+  const volLabel = useEnumLabel('volatility', mat.volatility ?? '')
   const spotCode = spotCodeFor(mat.code)
   const latestQ = useQuery({
     queryKey: ['v2:indicator:latest', spotCode],
@@ -192,7 +205,7 @@ function MaterialTile({ mat }: { mat: ResolvedMaterial }) {
         {value != null ? (
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-semibold text-ink-50 tnum">
-              {mat.unit.startsWith('USD') ? `$${value.toFixed(2)}` : `¥${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+              {mat.unit.startsWith('USD') ? `$${value.toFixed(2)}` : `¥${value.toLocaleString(i18n.language, { maximumFractionDigits: 0 })}`}
             </span>
             <span className={cn('flex items-center gap-0.5 text-[11px] font-mono tnum', up ? 'num-up' : 'num-down')}>
               {up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -200,12 +213,12 @@ function MaterialTile({ mat }: { mat: ResolvedMaterial }) {
             </span>
           </div>
         ) : (
-          <span className="label-meta-sm">data incoming</span>
+          <span className="label-meta-sm">{tCommon('states.data_incoming')}</span>
         )}
       </div>
       <div className="mt-2 flex items-center justify-between">
         <span className={cn('label-meta-sm flex items-center gap-1', volColor)}>
-          <VolIcon className="w-3 h-3" /> {mat.volatility ?? 'vol'} · {mat.category ?? '—'}
+          <VolIcon className="w-3 h-3" /> {volLabel || mat.volatility || '—'} · {mat.category ?? '—'}
         </span>
       </div>
     </Link>
@@ -218,14 +231,22 @@ function IndicatorRow({ ind }: { ind: ResolvedIndicator }) {
     queryFn: () => v2.indicatorLatest(ind.code),
     retry: false,
   })
+  const displayName = useLocalizedField(ind, 'name') || ind.code
+  const description = useLocalizedField(ind, 'description')
   const value = latestQ.data?.value
   const d = value != null ? ((Math.round(value * 997) % 400) - 200) / 100 : 0
   const up = d >= 0
+  const showCodeChip = displayName !== ind.code
   return (
     <li className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3 hover:bg-hover transition">
-      <Link to={`/materials/${ind.code}`} className="min-w-0">
-        <p className="font-mono text-sm text-ink-100">{ind.code}</p>
-        {ind.description && <p className="text-xs text-ink-500 truncate">{ind.description}</p>}
+      <Link to={`/materials/${ind.code}`} className="min-w-0 group">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <p className="text-sm font-semibold text-ink-50 group-hover:text-brand-500 transition truncate">{displayName}</p>
+          {showCodeChip && (
+            <span className="font-mono text-[10px] text-ink-500 flex-shrink-0">{ind.code}</span>
+          )}
+        </div>
+        {description && <p className="text-xs text-ink-400 truncate mt-0.5">{description}</p>}
       </Link>
       <Sparkline currentValue={value ?? 0} width={96} height={24} />
       <span className="num-data-strong text-sm min-w-[90px] text-right">

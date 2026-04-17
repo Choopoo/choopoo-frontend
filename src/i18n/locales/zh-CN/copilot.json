@@ -1,0 +1,20 @@
+{
+  "page": {
+    "title": "助理",
+    "subtitle_prefix": "未配置 ",
+    "subtitle_suffix": " 时为模拟模式 · 每次工具调用都按租户 org_id 经网关执行",
+    "env_var_label": "ANTHROPIC_API_KEY"
+  },
+  "input": {
+    "placeholder": "提问或运行模拟指令…",
+    "send": "发送",
+    "thinking": "思考中…"
+  },
+  "empty": {
+    "awaiting_input": "等待输入",
+    "try_one_below": "可尝试下方任一建议 ↓"
+  },
+  "tool_call": {
+    "label": "工具调用"
+  }
+}

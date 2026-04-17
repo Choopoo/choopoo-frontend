@@ -1,0 +1,10 @@
+{
+  "page": {
+    "back": "工作台"
+  },
+  "evidence": {
+    "title": "证据 · {{count}}",
+    "none": "未引用任何证据。",
+    "weight": "权重 {{value}}"
+  }
+}

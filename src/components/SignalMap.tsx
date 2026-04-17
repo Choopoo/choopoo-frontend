@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CheckCircle2, AlertTriangle, X, ChevronRight, Link2, ExternalLink } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { v2, type SubjectAspect } from '../api/v2'
 import { Card } from './Card'
 import { cn } from '../lib/utils'
+import { useEnumLabel } from '../i18n/useEnumLabel'
+import { normalizeLocale } from '../i18n'
 
 /**
  * Signal Map for a subject (a raw material code like "TDI").
@@ -19,6 +22,7 @@ import { cn } from '../lib/utils'
  *     example events + provider count + an evidence-verified badge.
  */
 export function SignalMap({ subjectCode }: { subjectCode: string }) {
+  const { t } = useTranslation('materials')
   const q = useQuery({
     queryKey: ['v2:subject:aspects', subjectCode],
     queryFn: () => v2.subjectAspects(subjectCode, 'all'),
@@ -41,28 +45,21 @@ export function SignalMap({ subjectCode }: { subjectCode: string }) {
 
   return (
     <Card
-      title={
-        <span className="flex items-center gap-2">
-          Signal map · <span className="text-ink-100">{subjectCode}</span>
-        </span>
-      }
+      title={t('signal_map.title', { subject: subjectCode })}
       action={
         <span className="label-meta-sm">
-          {active.length} active · {candidates.length} candidate
+          {t('signal_map.active_count', { count: active.length })} · {t('signal_map.candidate_count', { count: candidates.length })}
         </span>
       }
     >
-      {q.isLoading && <p className="text-xs text-ink-500 font-mono">loading…</p>}
+      {q.isLoading && <p className="text-xs text-ink-500 font-mono">{t('loading', { ns: 'common', defaultValue: 'loading…' })}</p>}
       {rows.length === 0 && !q.isLoading && (
-        <p className="text-sm text-ink-500">
-          No aspects ranked yet for <span className="font-mono">{subjectCode}</span>. Ask the
-          copilot: <code className="text-brand-500">propose aspects for {subjectCode}</code>.
-        </p>
+        <p className="text-sm text-ink-500">{t('signal_map.no_active')}</p>
       )}
 
       {active.length > 0 && (
         <div>
-          <p className="label-meta-sm mb-2">Active · driving insights</p>
+          <p className="label-meta-sm mb-2">{t('signal_map.active_section')}</p>
           <ul className="flex flex-wrap gap-2">
             {active.map((a) => (
               <AspectChip key={a.aspect_id} aspect={a} active selected={openId === a.aspect_id} onClick={() => setOpenId(a.aspect_id)} />
@@ -73,7 +70,7 @@ export function SignalMap({ subjectCode }: { subjectCode: string }) {
 
       {candidates.length > 0 && (
         <div className="mt-4">
-          <p className="label-meta-sm mb-2">Candidate · click a chip to review the chain, then activate</p>
+          <p className="label-meta-sm mb-2">{t('signal_map.candidate_section')}</p>
           <ul className="flex flex-wrap gap-2">
             {candidates.map((a) => (
               <AspectChip key={a.aspect_id} aspect={a} active={false} selected={openId === a.aspect_id} onClick={() => setOpenId(a.aspect_id)} />
@@ -84,7 +81,7 @@ export function SignalMap({ subjectCode }: { subjectCode: string }) {
 
       {rejected.length > 0 && (
         <details className="mt-4">
-          <summary className="label-meta-sm cursor-pointer">{rejected.length} rejected (click to show)</summary>
+          <summary className="label-meta-sm cursor-pointer">{rejected.length} {useEnumLabel('aspect_status', 'rejected')}</summary>
           <ul className="flex flex-wrap gap-2 mt-2">
             {rejected.map((a) => (
               <li key={a.aspect_id} className="chip opacity-60 line-through">{a.aspect_code}</li>
@@ -99,8 +96,14 @@ export function SignalMap({ subjectCode }: { subjectCode: string }) {
 }
 
 function AspectChip({ aspect, active, selected, onClick }: { aspect: SubjectAspect; active: boolean; selected: boolean; onClick: () => void }) {
+  const { i18n } = useTranslation()
   const score = aspect.score ?? 0
   const verified = aspect.evidence_verified
+  // Prefer Chinese aspect name in zh locale; fall back to English aspect_name; final fallback the code.
+  const localizedName =
+    normalizeLocale(i18n.language) === 'zh-CN'
+      ? aspect.aspect_name_cn || aspect.aspect_name || aspect.aspect_code
+      : aspect.aspect_name || aspect.aspect_code
   return (
     <li>
       <button
@@ -110,12 +113,12 @@ function AspectChip({ aspect, active, selected, onClick }: { aspect: SubjectAspe
           active ? 'chip-brand' : 'chip',
           selected && 'ring-1 ring-brand-500',
         )}
-        title={`score ${score.toFixed(2)} · ${aspect.relevance_rationale ?? ''}`}
+        title={`${localizedName} · ${score.toFixed(2)}${aspect.relevance_rationale ? ' · ' + aspect.relevance_rationale : ''}`}
       >
         {verified && <CheckCircle2 className="w-3 h-3 text-up" />}
         {!verified && active && <AlertTriangle className="w-3 h-3 text-warn" />}
-        {aspect.aspect_code}
-        <span className="text-ink-500 ml-1">{score.toFixed(2)}</span>
+        {localizedName}
+        <span className="text-ink-200 ml-1">{score.toFixed(2)}</span>
       </button>
     </li>
   )

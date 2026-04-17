@@ -22,7 +22,8 @@ async function req<T>(method: string, path: string, body?: unknown): Promise<T> 
   return res.json() as Promise<T>
 }
 
-export type Me = { user_id: number; org_id: number; email: string; role: string }
+export type Locale = 'en' | 'zh-CN'
+export type Me = { user_id: number; org_id: number; email: string; role: string; locale: Locale }
 
 export type Goal = {
   id: number
@@ -69,6 +70,8 @@ export type CatalogProduct = {
 export type CatalogIndicator = {
   id: number
   code: string
+  name: string | null
+  name_cn: string | null
   kind: string
   subject_kind: string
   subject_code: string | null
@@ -78,6 +81,7 @@ export type CatalogIndicator = {
   source_id: number | null
   formula_json: unknown
   description: string | null
+  description_cn: string | null
 }
 
 export type ResolvedMaterial = {
@@ -96,6 +100,8 @@ export type ResolvedIndicator = {
   source: 'catalog' | 'catalog+override' | 'private'
   id: number
   code: string
+  name?: string | null
+  name_cn?: string | null
   kind: string
   subject_kind: string
   subject_code: string | null
@@ -104,6 +110,7 @@ export type ResolvedIndicator = {
   cadence_minutes: number
   formula_json: unknown
   description: string | null
+  description_cn?: string | null
 }
 
 export type Insight = {
@@ -160,6 +167,9 @@ export const v2 = {
     goalId: number,
     body: { indicator_kind: 'catalog' | 'tenant'; indicator_id: number; role?: string },
   ) => req<{ id: number }>('POST', `/api/v2/goals/${goalId}/indicators`, body),
+
+  // me
+  meUpdate: (body: { locale: Locale }) => req<{ locale: Locale }>('PATCH', '/api/v2/me', body),
 
   // catalog
   catalogMaterials: () => req<CatalogMaterial[]>('GET', '/api/v2/catalog/materials'),
@@ -222,7 +232,9 @@ export type Aspect = {
   id: number
   code: string
   name: string
+  name_cn: string | null
   description: string | null
+  description_cn: string | null
   axis: string
   default_relevance: number
 }
@@ -241,6 +253,7 @@ export type SubjectAspect = {
   aspect_id: number
   aspect_code: string
   aspect_name: string
+  aspect_name_cn: string | null
   axis: string
   status: 'active' | 'candidate' | 'rejected'
   relevance_r: number | null

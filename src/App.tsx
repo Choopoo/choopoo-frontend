@@ -1,5 +1,6 @@
 import { NavLink, Route, Routes, Link } from 'react-router-dom'
 import { Activity, Sparkles, Target, Command } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAuth, RequireAuth } from './auth'
 import Login from './pages/Login'
 import Home from './pages/Home'
@@ -17,13 +18,14 @@ import { CommandPalette } from './components/CommandPalette'
 import { AvatarMenu } from './components/AvatarMenu'
 import { cn } from './lib/utils'
 
-const nav = [
-  { to: '/', label: 'Desk', icon: Target, end: true },
-  { to: '/copilot', label: 'Ask', icon: Sparkles },
+const navItems = [
+  { to: '/', tKey: 'nav.desk', icon: Target, end: true },
+  { to: '/copilot', tKey: 'nav.ask', icon: Sparkles },
 ]
 
 export default function App() {
   const { me } = useAuth()
+  const { t } = useTranslation()
   return (
     <div className="min-h-full flex flex-col bg-canvas">
       {me && (
@@ -31,10 +33,10 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-6 h-14 flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2 label-meta text-brand-500">
               <Activity className="w-4 h-4" />
-              Choopoo
+              {t('app_name')}
             </Link>
             <nav className="flex items-center gap-0.5">
-              {nav.map(({ to, label, icon: Icon, end }) => (
+              {navItems.map(({ to, tKey, icon: Icon, end }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -49,7 +51,7 @@ export default function App() {
                   }
                 >
                   <Icon className="w-3.5 h-3.5" />
-                  {label}
+                  {t(tKey)}
                 </NavLink>
               ))}
             </nav>

@@ -1,30 +1,29 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, ShieldCheck, TrendingUp, TrendingDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { v2, type ResolvedIndicator, type ResolvedMaterial } from '../api/v2'
 import { Card } from '../components/Card'
 import { Badge } from '../components/Badge'
 import { Sparkline } from '../components/Sparkline'
+import { PageHeader } from '../components/PageHeader'
+import { useLocalizedField } from '../i18n/useLocalizedField'
+import { useEnumLabel } from '../i18n/useEnumLabel'
 
 export default function Materials() {
+  const { t } = useTranslation('materials')
   const matsQ = useQuery({ queryKey: ['v2:me:materials'], queryFn: v2.meMaterials })
   const indQ = useQuery({ queryKey: ['v2:me:indicators'], queryFn: v2.meIndicators })
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6 space-y-5">
-      <header>
-        <h1 className="text-xl font-semibold text-ink-50 tracking-tight">Materials</h1>
-        <p className="text-xs font-mono text-ink-500 mt-1 uppercase tracking-wider">
-          Buy-lens · live values from composer · sparkline = 28-day
-        </p>
-      </header>
+      <PageHeader title={t('page.title')} subtitle={t('page.subtitle')} />
 
-      <Card title={`My materials · ${matsQ.data?.length ?? 0}`} padded={false}>
-        {matsQ.isLoading && <div className="p-5 text-xs text-ink-500 font-mono">loading…</div>}
+      <Card title={t('cards.my_materials', { count: matsQ.data?.length ?? 0 })} padded={false}>
+        {matsQ.isLoading && <div className="p-5 text-xs text-ink-500 font-mono">{t('loading', { ns: 'common', defaultValue: 'loading…' })}</div>}
         {matsQ.data && matsQ.data.length === 0 && (
           <p className="p-5 text-sm text-ink-500">
-            None enabled. <Link to="/copilot" className="text-brand-500 underline">Ask the copilot</Link> "enable TDI"
-            or create a new goal — the autopilot will enable the right ones.
+            <Link to="/copilot" className="text-brand-500 underline">{t('cards.my_materials_empty_prompt')}</Link>
           </p>
         )}
         {matsQ.data && matsQ.data.length > 0 && (
@@ -34,7 +33,7 @@ export default function Materials() {
         )}
       </Card>
 
-      <Card title={`Composite indicators · ${(indQ.data ?? []).filter((i) => i.kind === 'spread' || i.kind === 'derived').length}`} padded={false}>
+      <Card title={t('cards.composite_indicators', { count: (indQ.data ?? []).filter((i) => i.kind === 'spread' || i.kind === 'derived').length })} padded={false}>
         {indQ.isLoading && <div className="p-5 text-xs text-ink-500 font-mono">loading…</div>}
         {indQ.data && (
           <ul className="divide-y divide-line">
@@ -104,14 +103,24 @@ function IndicatorRow({ ind }: { ind: ResolvedIndicator }) {
     queryFn: () => v2.indicatorLatest(ind.code),
     retry: false,
   })
+  // Localized label; falls back to code if neither name nor name_cn is set.
+  const displayName = useLocalizedField(ind, 'name') || ind.code
+  const description = useLocalizedField(ind, 'description')
+  const sourceLabel = useEnumLabel('indicator_source', ind.source)
   const value = latestQ.data?.value
   const d = value != null ? ((Math.round(value * 997) % 400) - 200) / 100 : 0
   const up = d >= 0
+  const showCodeChip = displayName !== ind.code
   return (
     <li className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3 hover:bg-hover transition">
-      <Link to={`/materials/${ind.code}`} className="min-w-0">
-        <p className="font-mono text-sm text-ink-100">{ind.code}</p>
-        {ind.description && <p className="text-xs text-ink-500 truncate">{ind.description}</p>}
+      <Link to={`/materials/${ind.code}`} className="min-w-0 group">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <p className="text-sm font-semibold text-ink-50 group-hover:text-brand-500 transition truncate">{displayName}</p>
+          {showCodeChip && (
+            <span className="font-mono text-[10px] text-ink-500 flex-shrink-0">{ind.code}</span>
+          )}
+        </div>
+        {description && <p className="text-xs text-ink-400 truncate mt-0.5">{description}</p>}
       </Link>
       <Sparkline currentValue={value ?? 0} width={96} height={24} />
       <span className="font-mono text-sm text-ink-100 tnum min-w-[90px] text-right">
@@ -122,7 +131,7 @@ function IndicatorRow({ ind }: { ind: ResolvedIndicator }) {
         {value != null ? `${up ? '+' : ''}${d.toFixed(2)}%` : ''}
       </span>
       <Badge variant={ind.source === 'private' ? 'brand' : ind.source === 'catalog+override' ? 'warn' : 'neutral'}>
-        {ind.source}
+        {sourceLabel}
       </Badge>
     </li>
   )

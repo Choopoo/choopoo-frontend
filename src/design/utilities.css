@@ -42,49 +42,59 @@
   font-feature-settings: "tnum" 1;
 }
 
-/* ALL-CAPS MONO LABELS (used for section headers, chip labels, meta strip) */
-.label-meta {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-11);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-ink-500);
-}
-.label-meta-sm {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-10);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-ink-500);
-}
+/*
+ * Typography role classes live in @layer components so Tailwind's
+ * @layer utilities (which loads after components) wins on the cascade.
+ * Otherwise an explicit text-brand-500 / text-ink-50 etc. would lose to
+ * the role class's hardcoded color — that's why the "CHOOPOO" wordmark
+ * with text-brand-500 was rendering as ink-500 gray.
+ */
 
-/* Page-level titles */
-.type-page-title {
-  font-size: var(--font-size-20);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  color: var(--color-ink-50);
-  line-height: 1.2;
-}
-.type-page-sub {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-11);
-  color: var(--color-ink-500);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-top: 0.25rem;
-}
+@layer components {
+  /* ALL-CAPS MONO LABELS (used for section headers, chip labels, meta strip) */
+  .label-meta {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-11);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-500);
+  }
+  .label-meta-sm {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-10);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-500);
+  }
 
-/* Section titles (inside cards) — the default Card component uses this */
-.type-section-title {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-11);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-ink-400);
+  /* Page-level titles */
+  .type-page-title {
+    font-size: var(--font-size-20);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--color-ink-50);
+    line-height: 1.2;
+  }
+  .type-page-sub {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-11);
+    color: var(--color-ink-500);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+  }
+
+  /* Section titles (inside cards) — the default Card component uses this */
+  .type-section-title {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-11);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-400);
+  }
 }
 
 /* ─────────────── NUMERIC SEMANTICS ─────────────── */

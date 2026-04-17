@@ -1,0 +1,53 @@
+{
+  "page": {
+    "title": "Materials",
+    "subtitle": "Buy-lens · live values from composer · sparkline = 28-day"
+  },
+  "products_page": {
+    "title": "Products",
+    "subtitle": "Sell lens · finished products you make + where demand is heading",
+    "finished_products": "Finished products · {{count}}",
+    "catalog_empty": "Catalog is empty.",
+    "demand_signals": "Regional demand signals · seeded",
+    "demand_commentary": "Demand commentary",
+    "demand_lines": {
+      "0": "Furniture export YoY positive in EC + SC → wood-coating hardeners (TDI-75) should see steady pull through Q2.",
+      "1": "Auto production softening in NC — aliphatic refinish demand is the marginal question; watch HDI/TDI premium for margin signal.",
+      "2": "Construction PMI > 50 in EC + SC supports 1K moisture-cure PU adhesive volume; NC under 50 suggests modest deceleration."
+    },
+    "demand_caveat": "Commentary is rule-based. Replace with forecaster/event-extractor output once demand scrapers land post-demo."
+  },
+  "macro_page": {
+    "title": "Macro",
+    "subtitle": "crude · FX · demand PMI · regulatory feed · not tenant-scoped"
+  },
+  "cards": {
+    "my_materials": "My materials · {{count}}",
+    "composite_indicators": "Composite indicators · {{count}}",
+    "regulatory_watchlist": "Regulatory watchlist · {{count}}",
+    "macro_series": "Macro series · {{count}}",
+    "spot_chart": "Spot chart · signal map · induction chains"
+  },
+  "row": {
+    "category": "{{category}}",
+    "data_incoming": "data incoming"
+  },
+  "signal_map": {
+    "title": "Signal map · {{subject}}",
+    "active_count": "{{count}} active",
+    "candidate_count": "{{count}} candidate",
+    "active_section": "Active · driving insights",
+    "candidate_section": "Candidate · click to review",
+    "no_active": "No active aspects yet — pick from candidates below.",
+    "no_candidates": "No candidates queued — ask the copilot to scout this subject.",
+    "drawer": {
+      "induction_chain": "Induction chain",
+      "example_events": "Example events",
+      "evidence_verified": "evidence verified",
+      "evidence_unverified": "evidence not yet verified",
+      "activate": "Activate",
+      "deactivate": "Move to candidate",
+      "score": "score {{score}}"
+    }
+  }
+}

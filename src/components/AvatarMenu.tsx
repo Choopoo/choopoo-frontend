@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Activity, Database, LogOut, User } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth'
 import { cn } from '../lib/utils'
+import { LocaleSwitcher } from './LocaleSwitcher'
 
 /**
  * Click-to-open dropdown for admin + low-frequency surfaces that used to
@@ -10,6 +12,7 @@ import { cn } from '../lib/utils'
  */
 export function AvatarMenu() {
   const { me, logout } = useAuth()
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const nav = useNavigate()
@@ -52,16 +55,19 @@ export function AvatarMenu() {
             <p className="label-meta-sm mt-0.5">{me.role} · org {me.org_id}</p>
           </div>
           <ul className="py-1">
-            <MenuItem icon={Activity} to="/status" onClick={() => setOpen(false)}>Pipeline status</MenuItem>
-            <MenuItem icon={Database} to="/sources" onClick={() => setOpen(false)}>Sources · audit</MenuItem>
+            <MenuItem icon={Activity} to="/status" onClick={() => setOpen(false)}>{t('nav.status')}</MenuItem>
+            <MenuItem icon={Database} to="/sources" onClick={() => setOpen(false)}>{t('nav.sources')}</MenuItem>
           </ul>
+          <div className="border-t border-line">
+            <LocaleSwitcher onSelect={() => setOpen(false)} />
+          </div>
           <div className="border-t border-line py-1">
             <button
               onClick={async () => { setOpen(false); await logout(); nav('/login') }}
               className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-100 hover:bg-hover hover:text-ink-50 text-left"
             >
               <LogOut className="w-3.5 h-3.5 text-ink-400" />
-              Logout
+              {t('actions.logout')}
             </button>
           </div>
         </div>

@@ -1,0 +1,15 @@
+{
+  "page": {
+    "title": "Pipeline Status",
+    "subtitle": "refreshes every 10s · gateway → kafka/redis/postgres"
+  },
+  "services": {
+    "kafka": "Kafka",
+    "redis": "Redis",
+    "postgres": "Postgres"
+  },
+  "errors": {
+    "cannot_reach_backend": "Cannot reach backend gateway. Check docker-compose is running."
+  },
+  "service_label": "Service"
+}

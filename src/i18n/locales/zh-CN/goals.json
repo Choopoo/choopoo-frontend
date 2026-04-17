@@ -1,0 +1,24 @@
+{
+  "wizard": {
+    "title": "新建目标",
+    "step": "第 {{current}} 步 / 共 {{total}} 步 — {{label}}",
+    "step_label_name": "命名你的目标",
+    "step_label_pick": "选择驱动指标",
+    "title_label": "标题",
+    "title_placeholder": "例如：四季度前将 TDI 采购成本下降 5%",
+    "lens_label": "视角",
+    "horizon_label": "周期（天）",
+    "creating": "创建中…",
+    "suggested_for": "为 \"{{lens}}\" 视角推荐",
+    "done_picked": "完成 · 已选 {{count}}",
+    "ask_copilot_to_add_private": "新建私有指标。",
+    "dont_see": "找不到合适的？请助理"
+  },
+  "detail": {
+    "back": "工作台",
+    "primary_driver_suffix": " · 主驱动",
+    "saga_no_run": "尚无主驱动指标 — 自动化流程可能仍在执行。",
+    "indicators": "指标 · {{count}}",
+    "pinned_badge": "已置顶"
+  }
+}

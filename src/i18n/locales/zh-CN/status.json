@@ -1,0 +1,15 @@
+{
+  "page": {
+    "title": "管道状态",
+    "subtitle": "每 10 秒刷新 · 网关 → Kafka / Redis / Postgres"
+  },
+  "services": {
+    "kafka": "Kafka",
+    "redis": "Redis",
+    "postgres": "Postgres"
+  },
+  "errors": {
+    "cannot_reach_backend": "无法访问后端网关，请检查 docker-compose 是否在运行。"
+  },
+  "service_label": "服务"
+}

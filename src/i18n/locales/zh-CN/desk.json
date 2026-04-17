@@ -1,0 +1,28 @@
+{
+  "page": {
+    "title": "工作台",
+    "subtitle": "置顶优先 · 每个新目标都会触发自动化流程",
+    "subtitle_materials": "跨目标的原料组合 · 数据由 composer 实时计算"
+  },
+  "empty": {
+    "no_goals": "暂无目标 — 点击上方「新建目标」或按 ⌘K 打开命令面板。"
+  },
+  "tabs": {
+    "goals": "目标",
+    "materials": "原料"
+  },
+  "cards": {
+    "todays_briefing": "今日速报",
+    "todays_briefing_empty": "暂无速报。自动化流程与摘要服务接入数据源后会自动出现。",
+    "my_materials": "我的原料 · {{count}}",
+    "my_materials_empty_prompt": "尚未启用任何原料。让助理执行 \"enable TDI\"，或新建目标，自动化流程会启用合适的原料。",
+    "composite_indicators": "组合指标 · {{count}}",
+    "composite_indicators_empty_prompt": "暂无组合指标 — 在助理中试试 compose:MY_SPREAD:…",
+    "regulatory_watchlist": "政策观察 · {{count}}",
+    "macro_series": "宏观数据 · {{count}}"
+  },
+  "tile": {
+    "new_goal": "新建目标",
+    "plan": "方案 {{label}}"
+  }
+}

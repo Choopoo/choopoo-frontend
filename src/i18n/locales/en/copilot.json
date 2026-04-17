@@ -1,0 +1,20 @@
+{
+  "page": {
+    "title": "Copilot",
+    "subtitle_prefix": "stub mode when ",
+    "subtitle_suffix": " unset · every tool call hits gateway with your org_id",
+    "env_var_label": "ANTHROPIC_API_KEY"
+  },
+  "input": {
+    "placeholder": "ask or run a stub command…",
+    "send": "Send",
+    "thinking": "thinking…"
+  },
+  "empty": {
+    "awaiting_input": "awaiting input",
+    "try_one_below": "try one of the suggestions below ↓"
+  },
+  "tool_call": {
+    "label": "tool call"
+  }
+}

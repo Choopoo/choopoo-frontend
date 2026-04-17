@@ -1,0 +1,10 @@
+{
+  "page": {
+    "back": "Desk"
+  },
+  "evidence": {
+    "title": "Evidence · {{count}}",
+    "none": "No evidence cited.",
+    "weight": "weight {{value}}"
+  }
+}

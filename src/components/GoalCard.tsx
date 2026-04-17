@@ -1,17 +1,21 @@
 import { Link } from 'react-router-dom'
 import { ShoppingBag, ShoppingCart, Globe2, GitMerge } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { Goal } from '../api/v2'
 import { cn } from '../lib/utils'
+import { useEnumLabel } from '../i18n/useEnumLabel'
 
-const lensConf: Record<Goal['lens'], { label: string; icon: typeof ShoppingCart; tint: string }> = {
-  buy:   { label: 'BUY',   icon: ShoppingCart, tint: 'text-warn' },
-  sell:  { label: 'SELL',  icon: ShoppingBag,  tint: 'text-up' },
-  macro: { label: 'MACRO', icon: Globe2,       tint: 'text-info' },
-  mixed: { label: 'MIXED', icon: GitMerge,     tint: 'text-brand-500' },
+const lensConf: Record<Goal['lens'], { icon: typeof ShoppingCart; tint: string }> = {
+  buy:   { icon: ShoppingCart, tint: 'text-warn' },
+  sell:  { icon: ShoppingBag,  tint: 'text-up' },
+  macro: { icon: Globe2,       tint: 'text-info' },
+  mixed: { icon: GitMerge,     tint: 'text-brand-500' },
 }
 
 export function GoalCard({ goal }: { goal: Goal }) {
-  const { label, icon: Icon, tint } = lensConf[goal.lens]
+  const { t } = useTranslation()
+  const { icon: Icon, tint } = lensConf[goal.lens]
+  const label = useEnumLabel('lens', goal.lens)
   return (
     <Link
       to={`/goals/${goal.id}`}
@@ -26,7 +30,9 @@ export function GoalCard({ goal }: { goal: Goal }) {
           {label}
         </span>
         {goal.horizon_days != null && (
-          <span className="text-[10px] font-mono text-ink-500 tnum">{goal.horizon_days}D</span>
+          <span className="text-[10px] font-mono text-ink-500 tnum">
+            {t('units.days_short', { count: goal.horizon_days })}
+          </span>
         )}
       </div>
       <h3 className="text-sm font-semibold text-ink-100 leading-snug line-clamp-2 group-hover:text-ink-50">

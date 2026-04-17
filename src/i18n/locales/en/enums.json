@@ -1,0 +1,70 @@
+{
+  "lens": {
+    "buy": "Buy",
+    "sell": "Sell",
+    "macro": "Macro",
+    "mixed": "Mixed"
+  },
+  "lens_hint": {
+    "buy": "Costs to procure raw materials",
+    "sell": "Demand for finished products",
+    "macro": "Crude, FX, regulatory",
+    "mixed": "Touches multiple lenses"
+  },
+  "indicator_kind": {
+    "price": "Price",
+    "demand": "Demand",
+    "supply": "Supply",
+    "macro": "Macro",
+    "regulatory": "Regulatory",
+    "spread": "Spread",
+    "derived": "Derived"
+  },
+  "indicator_role": {
+    "primary": "Primary driver",
+    "driver": "Driver",
+    "context": "Context"
+  },
+  "indicator_source": {
+    "catalog": "catalog",
+    "catalog+override": "catalog · override",
+    "private": "private"
+  },
+  "aspect_status": {
+    "active": "active",
+    "candidate": "candidate",
+    "rejected": "rejected"
+  },
+  "aspect_code": {
+    "price": "Price",
+    "supply_event": "Plant events",
+    "shipping": "Shipping",
+    "regulatory": "Regulation",
+    "weather": "Weather",
+    "trade_flow": "Trade flow",
+    "geopolitics": "Geopolitics",
+    "demand_proxy": "Demand proxy",
+    "capacity_news": "Capacity news",
+    "macro_fx": "Macro & FX"
+  },
+  "insight_kind": {
+    "briefing": "Briefing",
+    "alert": "Alert",
+    "forecast": "Forecast",
+    "event": "Event",
+    "recommendation": "Recommendation"
+  },
+  "workflow_state": {
+    "planning": "Planning",
+    "running": "Running",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "compensating": "Compensating",
+    "compensated": "Compensated"
+  },
+  "volatility": {
+    "high": "high vol",
+    "medium": "medium vol",
+    "low": "low vol"
+  }
+}

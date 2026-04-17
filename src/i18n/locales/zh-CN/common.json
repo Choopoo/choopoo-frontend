@@ -1,0 +1,61 @@
+{
+  "app_name": "Choopoo",
+  "nav": {
+    "desk": "工作台",
+    "ask": "问询",
+    "materials": "原料",
+    "products": "产品",
+    "macro": "宏观",
+    "sources": "数据源",
+    "status": "运行状态",
+    "copilot": "助理",
+    "command_palette": "命令面板",
+    "command_palette_hint": "⌘K"
+  },
+  "actions": {
+    "new_goal": "新建目标",
+    "cancel": "取消",
+    "continue": "继续",
+    "submit": "提交",
+    "save": "保存",
+    "done": "完成",
+    "back": "返回",
+    "open": "打开",
+    "close": "关闭",
+    "delete": "删除",
+    "edit": "编辑",
+    "switch_language": "切换语言",
+    "logout": "退出登录"
+  },
+  "states": {
+    "loading": "加载中…",
+    "saving": "保存中…",
+    "no_data": "暂无数据",
+    "data_incoming": "数据加载中",
+    "empty": "（暂无）",
+    "error": "错误",
+    "ok": "正常",
+    "degraded": "降级",
+    "down": "故障",
+    "checking": "检测中"
+  },
+  "units": {
+    "days_short": "{{count}}天",
+    "days_horizon": "周期 {{count}} 天"
+  },
+  "footer": {
+    "ask_copilot_to": "请助理",
+    "or": "或"
+  },
+  "sources": {
+    "subtitle": "爬取队列 · 适配器 · RSS 源",
+    "results_title": "爬取结果 · {{count}}",
+    "filter_all": "全部",
+    "col_source": "来源",
+    "col_material": "原料",
+    "col_title": "标题",
+    "col_score": "评分",
+    "col_crawled": "抓取时间",
+    "empty": "v1 爬取结果为空（哨兵 org 0）。可在下方提交 URL。"
+  }
+}

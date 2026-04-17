@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, ExternalLink, Quote, LineChart } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { v2 } from '../api/v2'
 import { Card } from '../components/Card'
 import { Badge } from '../components/Badge'
 import { Markdown } from '../components/Markdown'
+import { useEnumLabel } from '../i18n/useEnumLabel'
 
 export default function InsightDetail() {
   const { id } = useParams<{ id: string }>()
@@ -25,25 +27,31 @@ export default function InsightDetail() {
     )
   }
   const ins = q.data!
+  return <InsightDetailInner ins={ins} />
+}
+
+function InsightDetailInner({ ins }: { ins: Awaited<ReturnType<typeof v2.insightDetail>> }) {
+  const { t } = useTranslation('insights')
+  const kindLabel = useEnumLabel('insight_kind', ins.kind)
   return (
     <div className="max-w-4xl mx-auto px-6 py-6 space-y-5">
       <Link to="/" className="inline-flex items-center gap-1 text-xs font-mono uppercase tracking-wider text-ink-500 hover:text-ink-100">
-        <ArrowLeft className="w-3.5 h-3.5" /> Desk
+        <ArrowLeft className="w-3.5 h-3.5" /> {t('page.back')}
       </Link>
       <header>
         <div className="flex items-center gap-2 mb-3">
-          <Badge variant="brand">{ins.kind}</Badge>
+          <Badge variant="brand">{kindLabel}</Badge>
           {ins.ai_model && <Badge>{ins.ai_model}</Badge>}
         </div>
-        <h1 className="text-xl font-semibold text-ink-50 tracking-tight">{ins.title}</h1>
+        <h1 className="type-page-title">{ins.title}</h1>
       </header>
       <Card padded={false}>
         <div className="p-5">
           <Markdown>{ins.body_md}</Markdown>
         </div>
       </Card>
-      <Card title={`Evidence · ${ins.evidence.length}`} padded={false}>
-        {ins.evidence.length === 0 && <p className="p-5 text-sm text-ink-500">No evidence cited.</p>}
+      <Card title={t('evidence.title', { count: ins.evidence.length })} padded={false}>
+        {ins.evidence.length === 0 && <p className="p-5 text-sm text-ink-500">{t('evidence.none')}</p>}
         <ul className="divide-y divide-line">
           {ins.evidence.map((e) => (
             <li key={e.id} className="px-5 py-4">
@@ -75,7 +83,7 @@ export default function InsightDetail() {
                   <span className="text-xs font-mono text-ink-500 tnum">{e.reading_ts || ''}</span>
                 </div>
               )}
-              <p className="text-[10px] font-mono text-ink-500 mt-2 uppercase tracking-wider">weight {e.weight}</p>
+              <p className="text-[10px] font-mono text-ink-500 mt-2 uppercase tracking-wider">{t('evidence.weight', { value: e.weight })}</p>
             </li>
           ))}
         </ul>

@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PriceChart } from '../components/PriceChart'
 import { SignalMap } from '../components/SignalMap'
 
@@ -8,19 +9,19 @@ import { SignalMap } from '../components/SignalMap'
  */
 export default function MaterialDetail() {
   const { code } = useParams<{ code: string }>()
+  const { t } = useTranslation('materials')
+  const tCommon = useTranslation().t
   if (!code) return null
-  // material's default spot code — best-effort. Uses the same mapping as
-  // elsewhere; for unknown codes we fall back to {code}_SPOT_EC.
   const spotCode = spotFor(code)
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6 space-y-5">
       <Link to="/?view=materials" className="inline-flex items-center gap-1 text-xs font-mono uppercase tracking-wider text-ink-500 hover:text-ink-100">
-        <ArrowLeft className="w-3.5 h-3.5" /> Portfolio
+        <ArrowLeft className="w-3.5 h-3.5" /> {tCommon('nav.materials')}
       </Link>
       <header>
         <h1 className="type-page-title">{code}</h1>
-        <p className="type-page-sub">spot chart · signal map · induction chains</p>
+        <p className="type-page-sub">{t('cards.spot_chart')}</p>
       </header>
 
       <PriceChart code={spotCode} title={spotCode} />

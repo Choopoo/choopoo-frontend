@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import i18n, { normalizeLocale } from './i18n'
 import { v2, type Me } from './api/v2'
 
 type AuthState = {
@@ -19,6 +20,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const data = await v2.me()
       setMe(data)
+      // The user's saved locale wins over browser-detect on every refresh.
+      const target = normalizeLocale(data.locale)
+      if (i18n.language !== target) await i18n.changeLanguage(target)
     } catch {
       setMe(null)
     } finally {

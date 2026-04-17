@@ -1,0 +1,28 @@
+{
+  "page": {
+    "title": "Desk",
+    "subtitle": "pinned first · autopilot runs on every new goal",
+    "subtitle_materials": "cross-goal material portfolio · live values from the composer"
+  },
+  "empty": {
+    "no_goals": "No goals yet — click New goal above or open the command palette (⌘K)."
+  },
+  "tabs": {
+    "goals": "Goals",
+    "materials": "Materials"
+  },
+  "cards": {
+    "todays_briefing": "Today's briefing",
+    "todays_briefing_empty": "No briefings yet. They appear as the autopilot and summariser ingest sources.",
+    "my_materials": "My materials · {{count}}",
+    "my_materials_empty_prompt": "None enabled. Ask the copilot \"enable TDI\" or create a new goal — the autopilot will enable the right ones.",
+    "composite_indicators": "Composite indicators · {{count}}",
+    "composite_indicators_empty_prompt": "No composite indicators yet — try compose:MY_SPREAD:… in the copilot.",
+    "regulatory_watchlist": "Regulatory watchlist · {{count}}",
+    "macro_series": "Macro series · {{count}}"
+  },
+  "tile": {
+    "new_goal": "New goal",
+    "plan": "PLAN {{label}}"
+  }
+}
